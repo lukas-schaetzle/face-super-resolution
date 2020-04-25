@@ -36,12 +36,12 @@ class App:
     self.window.mainloop()
 
   def useCamera(self):
-    self.video = MyVideoCapture(0)
+    self.vid = MyVideoCapture(0)
 
   def openFile(self):
     video_source = tkinter.filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
     print(video_source)
-    self.video = MyVideoCapture(video_source)
+    self.vid = MyVideoCapture(video_source)
 
   # Get a frame from the video source
   def snapshot(self):
