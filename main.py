@@ -1,7 +1,7 @@
+import time
 import tkinter, tkinter.filedialog
 import cv2
 import PIL.Image, PIL.ImageTk
-import time
 
 class App:
   def __init__(self, window, window_title, video_source=0):
