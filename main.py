@@ -1,46 +1,50 @@
 import time
-import tkinter, tkinter.filedialog
+import tkinter, tkinter.filedialog, tkinter.ttk
 import cv2
 import PIL.Image, PIL.ImageTk
 
 class App:
-  def __init__(self, window, window_title, video_source=0):
-    self.window = window
-    self.window.title(window_title)
+  def __init__(self, root, window_title, video_source=0):
+    self.root = root
+    self.root.option_add('*tearOff', tkinter.FALSE)
+    self.root.title(window_title)
     
-    menu = tkinter.Menu(self.window)
-    self.window.config(menu=menu)
+    self._addMenuBar(self.root)
+    frame = tkinter.ttk.Frame(self.root)
+    frame.pack(pady=5, padx=5)
+
+    self.vid = MyVideoCapture(video_source)
+    self.canvas = tkinter.Canvas(frame, width = self.vid.width, height = self.vid.height)
+    self.canvas.pack()
+
+    self.btn_snapshot=tkinter.Button(frame, text="Take snapshot", command=self.snapshot)
+    self.btn_snapshot.pack(anchor=tkinter.W, pady=(5, 0))
+
+    self.delay = 15
+    self.update()
+
+    self.root.mainloop()
+
+  def _addMenuBar(self, window):
+    menu = tkinter.Menu(window)
+    window.config(menu=menu)
 
     filemenu = tkinter.Menu(menu)
     menu.add_cascade(label="File", menu=filemenu)
-    filemenu.add_command(label="Get Camera Feed", command=self.useCamera)
-    filemenu.add_command(label="Open...", command=self.openFile)
+    filemenu.add_command(label="Get camera feed", command=self.useCamera)
+    filemenu.add_command(label="Open movie file...", command=self.openFile)
     filemenu.add_separator()
-    filemenu.add_command(label="Exit", command=self.window.quit)
+    filemenu.add_command(label="Exit", command=window.quit)
 
     helpmenu = tkinter.Menu(menu)
     menu.add_cascade(label="Help", menu=helpmenu)
     helpmenu.add_command(label="About")
 
-    self.vid = MyVideoCapture(video_source)
-
-    self.canvas = tkinter.Canvas(window, width = self.vid.width, height = self.vid.height)
-    self.canvas.pack()
-
-    self.btn_snapshot=tkinter.Button(window, text="Snapshot", width=50, command=self.snapshot)
-    self.btn_snapshot.pack(anchor=tkinter.CENTER, expand=True)
-
-    self.delay = 15
-    self.update()
-
-    self.window.mainloop()
-
   def useCamera(self):
     self.vid = MyVideoCapture(0)
 
   def openFile(self):
-    video_source = tkinter.filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
-    print(video_source)
+    video_source = tkinter.filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("movie files","*.avi"),("all files","*.*")))
     self.vid = MyVideoCapture(video_source)
 
   # Get a frame from the video source
@@ -56,7 +60,7 @@ class App:
       self.photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(frame))
       self.canvas.create_image(0, 0, image = self.photo, anchor = tkinter.NW) 
 
-    self.window.after(self.delay, self.update)
+    self.root.after(self.delay, self.update)
 
 
 class MyVideoCapture:
