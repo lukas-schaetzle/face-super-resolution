@@ -16,31 +16,11 @@ class App:
     self.vid = MyVideoCapture(video_source)
 
     self._addMenuBar(self.root)
-
-    main_screen = tk.PanedWindow(sashrelief=tk.GROOVE, sashwidth=4)
-    left_frame = tk.ttk.Frame(main_screen)
-    main_screen.add(left_frame)
-    right_frame = tk.ttk.Frame(main_screen)
-    main_screen.add(right_frame)
-    main_screen.paneconfig(left_frame, minsize=200)
-    main_screen.paneconfig(right_frame, minsize=100)
-
-    status_line = tk.ttk.Frame(self.root)
-
-    main_screen.grid(row=0, sticky=tk.W + tk.E + tk.N + tk.S)
-    status_line.grid(row=1, sticky=tk.W + tk.E)
-
-    tk.ttk.Label(left_frame, text="Video input:", font=(None, 11)).pack(anchor=tk.W, pady=(0,5))
-    self.canvas = ResizingCanvas(left_frame)
-    self.canvas.pack(expand=True, fill=tk.BOTH)
-
-    tk.ttk.Label(right_frame, text="Super resolution faces:", font=(None, 11)).pack(anchor=tk.W, pady=(0,5))
-
-    self.btn_snapshot=tk.Button(status_line, text="Take snapshot", command=self.snapshot)
-    self.btn_snapshot.pack(side=tk.LEFT)
-    self.status_text = tk.StringVar()
-    status_lbl= tk.ttk.Label(status_line, textvariable=self.status_text)
-    status_lbl.pack(side=tk.LEFT, padx=5 ,fill=tk.X)
+    status_bar = self._addStatusBar(self.root)
+    main_screen = self._addMainScreen(self.root)
+    
+    main_screen.grid(row=0, sticky=tk.W + tk.E + tk.N + tk.S, padx=5, pady=5)
+    status_bar.grid(row=1, sticky=tk.W + tk.E)
 
     self.root.rowconfigure(0, weight=1)
     self.root.columnconfigure(0, weight=1)
@@ -65,6 +45,38 @@ class App:
     helpmenu = tk.Menu(menu)
     menu.add_cascade(label="Help", menu=helpmenu)
     helpmenu.add_command(label="About")
+
+
+  def _addStatusBar(self, window):
+    status_line = tk.ttk.Frame(window, relief=tk.RAISED)
+    inner_status_line = tk.ttk.Frame(status_line)
+
+    self.btn_snapshot=tk.Button(inner_status_line, text="Take snapshot", command=self.snapshot)
+    self.btn_snapshot.pack(side=tk.LEFT)
+    self.status_text = tk.StringVar()
+    status_lbl= tk.ttk.Label(inner_status_line, textvariable=self.status_text)
+    status_lbl.pack(side=tk.LEFT, padx=(5, 0), fill=tk.X)
+
+    inner_status_line.pack(anchor=tk.W, padx=5, pady=5)
+    return status_line
+
+
+  def _addMainScreen(self, window):
+    main_screen = tk.PanedWindow(sashrelief=tk.RAISED, sashpad=5)
+    left_frame = tk.ttk.Frame(main_screen)
+    main_screen.add(left_frame)
+    right_frame = tk.ttk.Frame(main_screen)
+    main_screen.add(right_frame)
+    main_screen.paneconfig(left_frame, minsize=200)
+    main_screen.paneconfig(right_frame, minsize=100)
+
+    tk.ttk.Label(left_frame, text="Video input:", font=(None, 11)).pack(anchor=tk.W, pady=(0,5))
+    self.canvas = ResizingCanvas(left_frame)
+    self.canvas.pack(expand=True, fill=tk.BOTH)
+
+    tk.ttk.Label(right_frame, text="Super resolution faces:", font=(None, 11)).pack(anchor=tk.W, pady=(0,5))
+
+    return main_screen
 
 
   def useCamera(self):
@@ -116,4 +128,4 @@ class App:
     self.status_text.set(text)
 
 
-App(tk.Tk(), "First Test")
+App(tk.Tk(), "Face Super-Resolution")
