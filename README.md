@@ -4,4 +4,4 @@
 
 1. `pip install pipenv`
 2. `pipenv install`
-3. `pipenv run python main.py`
+3. `pipenv run python src/main.py`
