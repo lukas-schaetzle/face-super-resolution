@@ -9,7 +9,7 @@ class MyVideoCapture:
  
     self.width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)
     self.height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
-    self.currentFrame = None
+    self.current_frame = None
  
   def __del__(self):
     if self.vid.isOpened():
@@ -19,8 +19,8 @@ class MyVideoCapture:
     if self.vid.isOpened():
       ret, frame = self.vid.read()
       if ret:
-        self.currentFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        return (ret, self.currentFrame)
+        self.current_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        return (ret, self.current_frame)
       else:
         return (ret, None)
     else:
