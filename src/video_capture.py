@@ -20,7 +20,11 @@ class MyVideoCapture:
     if self.vid.isOpened():
       ret, frame = self.vid.read()
       # Hier kommt das aktuelle frame des Videos
+      
       if ret:
+        self.draw_rect(frame, (20, 20), (100, 100), "1")
+        cv2.imshow("frame", frame) # Temporary
+        
         """
         TODO
          in self.current_frame muss das annotierte Bild rein
@@ -32,3 +36,11 @@ class MyVideoCapture:
         return (ret, None)
     else:
       return (ret, None)
+
+  def draw_rect(self, img, origin, end, descr, color=(18, 156, 243)):
+    cv2.rectangle(img, origin, end, color, 1)
+
+    (text_width, text_height), baseline = cv2.getTextSize(descr, cv2.FONT_ITALIC, 0.5, 1)
+    text_height += baseline
+    cv2.rectangle(img, origin, (origin[0] + text_width, origin[1] + text_height), color, cv2.FILLED)
+    cv2.putText(img, descr, (origin[0], origin[1] + text_height - baseline), cv2.FONT_ITALIC, 0.5, (255, 255, 255), 1)

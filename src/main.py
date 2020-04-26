@@ -62,7 +62,7 @@ class App:
 
 
   def _addMainScreen(self, window):
-    main_screen = tk.PanedWindow(sashrelief=tk.RAISED, sashpad=5)
+    main_screen = tk.PanedWindow(sashrelief=tk.GROOVE, sashpad=5)
     left_frame = tk.ttk.Frame(main_screen)
     main_screen.add(left_frame)
     right_frame = tk.ttk.Frame(main_screen)
