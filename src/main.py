@@ -14,7 +14,9 @@ class App:
     self.root.title(window_title)
 
     self.vid = MyVideoCapture(video_source)
-
+    self.show_annotations = tk.BooleanVar()
+    self.show_annotations.set(True)
+    
     self._addMenuBar(self.root)
     status_bar = self._addStatusBar(self.root)
     main_screen = self._addMainScreen(self.root)
@@ -25,7 +27,7 @@ class App:
     self.root.rowconfigure(0, weight=1)
     self.root.columnconfigure(0, weight=1)
 
-    self.delay = 15
+    self.delay = 20 # in ms
     self.update()
 
     self.root.mainloop()
@@ -41,6 +43,10 @@ class App:
     filemenu.add_command(label="Open movie file...", command=self.openFile)
     filemenu.add_separator()
     filemenu.add_command(label="Exit", command=window.quit)
+
+    viewmenu = tk.Menu(menu)
+    menu.add_cascade(label="View", menu=viewmenu)
+    viewmenu.add_checkbutton(label="Show annotations", onvalue=1, offvalue=0, variable=self.show_annotations)
 
     helpmenu = tk.Menu(menu)
     menu.add_cascade(label="Help", menu=helpmenu)

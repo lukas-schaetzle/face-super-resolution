@@ -16,7 +16,7 @@ class MyVideoCapture:
     if self.vid.isOpened():
       self.vid.release()
 
-  def get_frame(self):
+  def get_frame(self, with_annotations=True):
     if self.vid.isOpened():
       ret, frame = self.vid.read()
       # Hier kommt das aktuelle frame des Videos
@@ -38,7 +38,7 @@ class MyVideoCapture:
       return (ret, None)
 
   def draw_rect(self, img, origin, end, descr, color=(18, 156, 243)):
-    cv2.rectangle(img, origin, end, color, 1)
+    cv2.rectangle(img, origin, end, color, 2)
 
     (text_width, text_height), baseline = cv2.getTextSize(descr, cv2.FONT_ITALIC, 0.5, 1)
     text_height += baseline
