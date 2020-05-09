@@ -9,31 +9,33 @@ class MyVideoCapture:
     self.width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)
     self.height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
     self.current_frame = None
+    self.current_frame_annotated = None
     self.super_res_faces = []
  
   def __del__(self):
     if self.vid.isOpened():
       self.vid.release()
 
-  def get_frame(self, with_annotations=True):
+  def next_frame(self):
     if self.vid.isOpened():
       ret, frame = self.vid.read()
       # Hier kommt das aktuelle frame des Videos
       
       if ret:
-        self.draw_rect(frame, (20, 20), (100, 100), "1")
+        annotatedFrame = frame.copy()
+        self.draw_rect(annotatedFrame, (20, 20), (100, 100), "1")
         
         """
         TODO
-         in self.current_frame muss das annotierte Bild rein
+         in annotatedFrame muss das annotierte Bild rein
          die vergrößerten Bilder sollten dann das Attribut super_res_faces überschreiben
         """
+
         self.current_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        return (ret, self.current_frame)
-      else:
-        return (ret, None)
-    else:
-      return (ret, None)
+        self.current_frame_annotated = cv2.cvtColor(annotatedFrame, cv2.COLOR_BGR2RGB)
+
+  def get_current_frame(self, with_annotations=True):
+    return self.current_frame_annotated if with_annotations else self.current_frame
 
   def draw_rect(self, img, origin, end, descr, color=(18, 156, 243)):
     cv2.rectangle(img, origin, end, color, 2)
