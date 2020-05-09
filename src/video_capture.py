@@ -1,5 +1,4 @@
 import cv2
-import PIL.Image, PIL.ImageTk
 
 class MyVideoCapture:
   def __init__(self, video_source=0):
@@ -23,7 +22,6 @@ class MyVideoCapture:
       
       if ret:
         self.draw_rect(frame, (20, 20), (100, 100), "1")
-        cv2.imshow("frame", frame) # Temporary
         
         """
         TODO
