@@ -3,13 +3,18 @@ from PyQt5.QtCore import Qt
 
 class ScalingPixmapLabel(QtWidgets.QLabel):
 
-  def __init__(self, *args, **kwargs):
+  def __init__(self, full_pixmap=None, *args, **kwargs):
     super().__init__(*args, **kwargs)
     self.setMinimumSize(1, 1)
     self.setAlignment(Qt.AlignCenter)
-    self.original_pixmap = None
+    
+    if full_pixmap:
+      self.setFullPixmap(full_pixmap)
+    else:
+      self.original_pixmap = None
 
-  def resizeEvent(self, evt):
+  def resizeEvent(self, event):
+    event.accept()
     if self.original_pixmap:
       self.setScaledPixmap()
 
@@ -27,4 +32,3 @@ class ScalingPixmapLabel(QtWidgets.QLabel):
       Qt.KeepAspectRatio,
       Qt.SmoothTransformation
     ))
-

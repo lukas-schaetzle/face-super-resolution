@@ -54,7 +54,6 @@
 
 
 import typing
-
 from PyQt5.QtCore import Qt, QPoint, QRect, QSize
 from PyQt5.QtWidgets import QWidget, QLayout, QLayoutItem, QStyle, QSizePolicy
 
