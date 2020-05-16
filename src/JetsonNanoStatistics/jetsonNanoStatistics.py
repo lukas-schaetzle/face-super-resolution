@@ -26,9 +26,9 @@ class JetsonNanoStatistics:
         with jtop() as jetson:
             while True:
                 self.__powerConsumptionInMilliwatts = jetson.stats["WATT"]
-                print(self.getAveragePowerConsumptionInMilliwattsFor(Component.CPU.value, ValueTypes.AVERAGE.value))
-                print(self.getAveragePowerConsumptionInMilliwattsFor(Component.MAINBOARD.value, ValueTypes.AVERAGE.value))
-                print(self.getAveragePowerConsumptionInMilliwattsFor(Component.GPU.value, ValueTypes.AVERAGE.value))
+                print(self.getPowerConsumptionInMilliwattsFor(Component.CPU.value, ValueTypes.AVERAGE.value))
+                print(self.getPowerConsumptionInMilliwattsFor(Component.MAINBOARD.value, ValueTypes.AVERAGE.value))
+                print(self.getPowerConsumptionInMilliwattsFor(Component.GPU.value, ValueTypes.AVERAGE.value))
 
     """
     component - every possible component listed in enumComponent.py, e.g. Component.CPU.value to get the value of CPU
