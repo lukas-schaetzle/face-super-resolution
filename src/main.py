@@ -47,11 +47,9 @@ class MainWindow(QMainWindow):
   def use_camera(self):
     self.stop_video_processor()
 
-    self.vid = VideoInterface(self, 0)
-    self.vid.start()
-
     try:
-      
+      self.vid = VideoInterface(self, 0)
+      self.vid.start()
       self.statusbar.showMessage("Using camera feed", self.STATUSBAR_DISPLAY_TIME)
     except:
       self.show_statusbar_error("Could not get camera feed")
@@ -86,6 +84,7 @@ class MainWindow(QMainWindow):
       self.show_statusbar_error("Snapshot could not be saved")
     else:
       self.statusbar.showMessage("Snapshot saved in folder: " + path, self.STATUSBAR_DISPLAY_TIME)
+
 
   def update(self):
     current_frame = self.vid.get_current_frame(self.action_show_annotations.isChecked())

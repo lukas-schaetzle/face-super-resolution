@@ -54,6 +54,7 @@
 
 
 import typing
+from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, QPoint, QRect, QSize
 from PyQt5.QtWidgets import QWidget, QLayout, QLayoutItem, QStyle, QSizePolicy
 
@@ -148,6 +149,7 @@ class FlowLayout(QLayout):
 
         for item in self.itemList:
             wid = item.widget()
+
             spaceX = self.horizontalSpacing()
             if spaceX == -1:
                 spaceX = wid.style().layoutSpacing(QSizePolicy.PushButton, QSizePolicy.PushButton, Qt.Horizontal)
@@ -155,18 +157,26 @@ class FlowLayout(QLayout):
             if spaceY == -1:
                 spaceY = wid.style().layoutSpacing(QSizePolicy.PushButton, QSizePolicy.PushButton, Qt.Vertical)
 
-            nextX = x + item.sizeHint().width() + spaceX
+            itemNewWidth = min(rect.width() - 2 * spaceX, item.sizeHint().width())
+            if (item.sizeHint().width() > 0):
+                itemNewHeight = item.sizeHint().height() * (itemNewWidth / item.sizeHint().width())
+            else:
+                itemNewHeight = 0
+            
+            itemSize = QtCore.QSize(itemNewWidth, itemNewHeight)
+
+            nextX = x + itemSize.width() + spaceX
             if nextX - spaceX > effectiveRect.right() and lineHeight > 0:
                 x = effectiveRect.x()
                 y = y + lineHeight + spaceY
-                nextX = x + item.sizeHint().width() + spaceX
+                nextX = x + itemSize.width() + spaceX
                 lineHeight = 0
 
             if not testOnly:
-                item.setGeometry(QRect(QPoint(x, y), item.sizeHint()))
+                item.setGeometry(QRect(QPoint(x, y), itemSize))
     
             x = nextX
-            lineHeight = max(lineHeight, item.sizeHint().height())
+            lineHeight = max(lineHeight, itemSize.height())
 
         return y + lineHeight - rect.y() + bottom
 

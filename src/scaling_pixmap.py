@@ -32,3 +32,9 @@ class ScalingPixmapLabel(QtWidgets.QLabel):
       Qt.KeepAspectRatio,
       Qt.SmoothTransformation
     ))
+  
+  def sizeHint(self):
+    if self.original_pixmap:
+      return self.original_pixmap.size()
+    else:
+      return self.size()

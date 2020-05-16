@@ -1,4 +1,4 @@
-import threading, time, cv2
+import threading, time, cv2, face_recognition
 from PyQt5 import QtGui, QtCore
 from helper import getPath
 from timeit import default_timer as timer
@@ -54,18 +54,15 @@ class VideoInterface(QtCore.QThread):
   def next_frame(self):
     if self.vid.isOpened():
       ret, frame = self.vid.read()
-      # Hier kommt das aktuelle frame des Videos
       
       if ret:
         annotatedFrame = frame.copy()
         self.draw_rect(annotatedFrame, (20, 20), (100, 100), "1")
         
-        """
-        TODO
-         in annotatedFrame muss das annotierte Bild rein
-         die vergrößerten Bilder sollten dann das Attribut super_res_faces überschreiben
-        """
-        time.sleep(0.1) # temporary
+        time.sleep(1)
+        # face_locations = face_recognition.face_locations(annotatedFrame)
+        # for (top, right, bottom, left) in face_locations:
+        #   self.draw_rect(annotatedFrame, (left, top), (right, bottom), "test")
 
         self.current_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         self.current_frame_annotated = cv2.cvtColor(annotatedFrame, cv2.COLOR_BGR2RGB)
