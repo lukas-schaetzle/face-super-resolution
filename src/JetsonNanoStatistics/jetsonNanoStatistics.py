@@ -19,20 +19,23 @@
 from jtop import jtop
 import time
 from enumComponent import Component
+from enumValueTypes import ValueTypes
 
 class JetsonNanoStatistics:
     def __init__(self):
         with jtop() as jetson:
             while True:
                 self.__powerConsumptionInMilliwatts = jetson.stats["WATT"]
-                print(self.getAveragePowerConsumptionInMilliwattsFor(Component.CPU.value))
-                print(self.getAveragePowerConsumptionInMilliwattsFor(Component.MAINBOARD.value))
-                print(self.getAveragePowerConsumptionInMilliwattsFor(Component.GPU.value))
+                print(self.getAveragePowerConsumptionInMilliwattsFor(Component.CPU.value, ValueTypes.AVERAGE.value))
+                print(self.getAveragePowerConsumptionInMilliwattsFor(Component.MAINBOARD.value, ValueTypes.AVERAGE.value))
+                print(self.getAveragePowerConsumptionInMilliwattsFor(Component.GPU.value, ValueTypes.AVERAGE.value))
+
     """
-    component - every possible component listed in enumComponent, e.g. EnumComponent.CPU.value to get the value of CPU
+    component - every possible component listed in enumComponent.py, e.g. Component.CPU.value to get the value of CPU
+    type - possible value type defined in enumValueTypes.py, e.g. ValueTypes.AVERAGE.value for average power consumption
     """
-    def getAveragePowerConsumptionInMilliwattsFor(self, component):
-        return self.__powerConsumptionInMilliwatts[component]['avg']
+    def getPowerConsumptionInMilliwattsFor(self, component, type):
+        return self.__powerConsumptionInMilliwatts[component][type]
 		
 """
 if __name__ == "__main__":
