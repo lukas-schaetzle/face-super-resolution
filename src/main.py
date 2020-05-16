@@ -1,102 +1,126 @@
-import time
-import tkinter as tk, tkinter.filedialog, tkinter.ttk
-import cv2
-import PIL.Image, PIL.ImageTk
+import sys, os, time, cv2
+from helper import clearLayout, getPath
+from scaling_pixmap import ScalingPixmapLabel
+from video_interface import VideoInterface
+from flow_layout import JFlowLayout
+from PyQt5 import QtWidgets, QtGui, QtCore, uic
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 
-from resizing_canvas import ResizingCanvas
-from video_capture import MyVideoCapture
+class MainWindow(QMainWindow):
+  STATUSBAR_DISPLAY_TIME = 3500
+  MAX_CLEANUP_WAIT = 1000
 
-class App:
-  def __init__(self, root, window_title, video_source=0):
-    self.root = root
-    self.root.option_add('*tearOff', tk.FALSE)
-    self.root.title(window_title)
+  def __init__(self):
+    super().__init__()
+    self.setWindowIcon(QtGui.QIcon(getPath("assets", "icon.png")))
 
-    self.vid = MyVideoCapture(video_source)
+    uic.loadUi(getPath("assets", "main.ui"), self)
+    self.layout_video_input = self.findChild(QtWidgets.QVBoxLayout, 'layout_videoInput')
+    self.statusbar = self.findChild(QtWidgets.QStatusBar, 'statusbar')
+    super_faces_area_widget = self.findChild(QtWidgets.QWidget, 'scrollAreaWidgetContents')
+    self.action_snapshot = self.findChild(QtWidgets.QAction, 'actionSnapshot')
+    self.action_close = self.findChild(QtWidgets.QAction, 'actionClose')
+    self.action_use_camera = self.findChild(QtWidgets.QAction, 'actionGet_camera_feed')
+    self.action_open_file = self.findChild(QtWidgets.QAction, 'actionOpen_video_file')
+    self.action_show_annotations = self.findChild(QtWidgets.QAction, 'actionShow_annotations')
+    self.fps_display = self.findChild(QtWidgets.QLineEdit, 'FPSLineEdit')
+    self.power_display = self.findChild(QtWidgets.QLineEdit, 'PowerLineEdit')
 
-    self._addMenuBar(self.root)
+    self.video_input = ScalingPixmapLabel()
+    self.layout_video_input.addWidget(self.video_input)
 
-    main_screen = tk.PanedWindow(sashrelief=tk.GROOVE, sashwidth=4)
-    left_frame = tk.ttk.Frame(main_screen)
-    main_screen.add(left_frame)
-    right_frame = tk.ttk.Frame(main_screen)
-    main_screen.add(right_frame)
-    main_screen.paneconfig(left_frame, minsize=200)
-    main_screen.paneconfig(right_frame, minsize=100)
+    self.super_faces_area = JFlowLayout()
+    super_faces_area_widget.setLayout(self.super_faces_area)
 
-    status_line = tk.ttk.Frame(self.root)
+    self.action_close.triggered.connect(self.close)
+    self.action_snapshot.triggered.connect(self.snapshot)
+    self.action_use_camera.triggered.connect(self.use_camera)
+    self.action_open_file.triggered.connect(self.open_file)
 
-    main_screen.grid(row=0, sticky=tk.W + tk.E + tk.N + tk.S)
-    status_line.grid(row=1, sticky=tk.W + tk.E)
+    self.vid = None
+    self.use_camera()
+    
+  def stop_video_processor(self):
+    if (self.vid):
+      self.vid.stop()
 
-    tk.ttk.Label(left_frame, text="Video input:", font=(None, 11)).pack()
-    self.canvas = ResizingCanvas(left_frame)
-    self.canvas.pack(expand=True, fill=tk.BOTH)
+  def use_camera(self):
+    self.stop_video_processor()
 
-    tk.ttk.Label(right_frame, text="Super resolution faces:", font=(None, 11)).pack()
+    self.vid = VideoInterface(self, 0)
+    self.vid.start()
 
-    self.btn_snapshot=tk.Button(status_line, text="Take snapshot", command=self.snapshot)
-    self.btn_snapshot.pack(side=tk.LEFT)
-    self.status_text= tk.ttk.Label(status_line, text="Status")
-    self.status_text.pack(side=tk.LEFT, fill=tk.X)
+    try:
+      
+      self.statusbar.showMessage("Using camera feed", self.STATUSBAR_DISPLAY_TIME)
+    except:
+      self.show_statusbar_error("Could not get camera feed")
 
-    self.root.rowconfigure(0, weight=1)
-    self.root.columnconfigure(0, weight=1)
+  def open_file(self):
+    self.stop_video_processor()
 
-    self.delay = 15
-    self.update()
+    file_name, _ = QFileDialog.getOpenFileName(self, "Open video", "", "All Files (*);;Movie Files (*.mp4 *.avi)")
+    # TODO: Add supported file formats
 
-    self.root.mainloop()
+    if (file_name):
+      try:
+        self.vid = VideoInterface(self, file_name)
+        self.vid.start()
+        self.statusbar.showMessage("Opened file " + file_name, self.STATUSBAR_DISPLAY_TIME)
+      except:
+        self.show_statusbar_error("Could not open file")
 
-
-  def _addMenuBar(self, window):
-    menu = tk.Menu(window)
-    window.config(menu=menu)
-
-    filemenu = tk.Menu(menu)
-    menu.add_cascade(label="File", menu=filemenu)
-    filemenu.add_command(label="Get camera feed", command=self.useCamera)
-    filemenu.add_command(label="Open movie file...", command=self.openFile)
-    filemenu.add_separator()
-    filemenu.add_command(label="Exit", command=window.quit)
-
-    helpmenu = tk.Menu(menu)
-    menu.add_cascade(label="Help", menu=helpmenu)
-    helpmenu.add_command(label="About")
-
-
-  def useCamera(self):
-    self.vid = MyVideoCapture(0)
-
-
-  def openFile(self):
-    video_source = tk.filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("movie files","*.avi"),("all files","*.*")))
-    self.vid = MyVideoCapture(video_source)
-
-
-  # Get a frame from the video source
   def snapshot(self):
-    frame = self.vid.currentFrame
-    if frame:
-      cv2.imwrite("frame-" + time.strftime("%d-%m-%Y-%H-%M-%S") + ".jpg", cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
-
+    try:
+      path = "./snapshots/" + time.strftime("%d-%m-%Y-%H-%M-%S")
+      os.makedirs(path)
+      cv2.imwrite(
+        os.path.join(path , "input_video.jpg"),
+        cv2.cvtColor(self.vid.current_frame, cv2.COLOR_RGB2BGR)
+      )
+      cv2.imwrite(
+        os.path.join(path , "input_video_annotated.jpg"),
+        cv2.cvtColor(self.vid.current_frame_annotated, cv2.COLOR_RGB2BGR)
+      )
+    except OSError:
+      self.show_statusbar_error("Snapshot could not be saved")
+    else:
+      self.statusbar.showMessage("Snapshot saved in folder: " + path, self.STATUSBAR_DISPLAY_TIME)
 
   def update(self):
-    ret, frame = self.vid.get_frame()
+    current_frame = self.vid.get_current_frame(self.action_show_annotations.isChecked())
 
-    if ret:
-      pil_image = PIL.Image.fromarray(frame)
+    if current_frame is not None:
+      img = QtGui.QImage(current_frame, self.vid.width, self.vid.height, QtGui.QImage.Format_RGB888)
+      pix = QtGui.QPixmap.fromImage(img)
+      self.video_input.setFullPixmap(pix)
 
-      self.canvas.update()
-      max_width = self.canvas.winfo_width()
-      max_height = self.canvas.winfo_height()
-      if ((max_width > 1) and (max_height > 1)):
-        pil_image.thumbnail((max_width, max_height), PIL.Image.ANTIALIAS)
-        
-      self.photo = PIL.ImageTk.PhotoImage(image=pil_image)
-      self.canvas_img = self.canvas.create_image(0, 0, image = self.photo, anchor = tk.NW) 
+    self.fps_display.setText('%.2f'%(self.vid.fps) if self.vid.fps else "N/A")
+    self.power_display.setText("N/A")
 
-    self.root.after(self.delay, self.update)
+    clearLayout(self.super_faces_area)
+    for face in self.vid.super_res_faces:
+      container = QtWidgets.QWidget()
+      text_label = QtWidgets.QLabel()
+      text_label.setText("Face")
+      image_label = ScalingPixmapLabel(face)
+      container.setLayout(QtWidgets.QVBoxLayout())
+      container.layout().addWidget(text_label)
+      container.layout().addWidget(image_label)
+      self.super_faces_area.addWidget(container)
+
+  def show_statusbar_error(self, msg):
+    self.statusbar.showMessage("ERROR: " + msg, self.STATUSBAR_DISPLAY_TIME)
+
+  def closeEvent(self, event):
+    event.accept()
+    if (self.vid):
+      self.vid.stop()
+      if (not self.vid.wait(self.MAX_CLEANUP_WAIT)):
+        self.vid.terminate()
 
 
-App(tk.Tk(), "First Test")
+app = QApplication(sys.argv)
+window = MainWindow()
+window.show()
+sys.exit(app.exec())
