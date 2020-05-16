@@ -26,9 +26,11 @@ class JetsonNanoStatistics:
         with jtop() as jetson:
             while True:
                 self.__powerConsumptionInMilliwatts = jetson.stats["WATT"]
+                """
                 print(self.getPowerConsumptionInMilliwattsFor(Component.CPU.value, ValueTypes.AVERAGE.value))
                 print(self.getPowerConsumptionInMilliwattsFor(Component.MAINBOARD.value, ValueTypes.AVERAGE.value))
                 print(self.getPowerConsumptionInMilliwattsFor(Component.GPU.value, ValueTypes.AVERAGE.value))
+                """
 
     """
     component - every possible component listed in enumComponent.py, e.g. Component.CPU.value to get the value of CPU
@@ -37,31 +39,5 @@ class JetsonNanoStatistics:
     def getPowerConsumptionInMilliwattsFor(self, component, type):
         return self.__powerConsumptionInMilliwatts[component][type]
 		
-"""
-if __name__ == "__main__":
-
-    print("Simple Tegrastats reader")
-
-    with jtop() as jetson:
-        while True:
-            # Read tegra stats
-            print(jetson.stats)
-	    print(jetson.stats["TEMP"])
-            # Status disk
-           # print(jetson.disk)
-            # Status fans
-           # if hasattr(jetson, 'fan'):
-           #     print(jetson.fan)
-            # uptime
-           # print(jetson.uptime)
-            # nvpmodel
-           # print(jetson.nvpmodel)
-            # local interfaces
-           # print(jetson.local_interfaces)
-            # boards
-            #print(jetson.board)
-            # Sleep before send new stat
-            time.sleep(1)
-"""
 statistics = JetsonNanoStatistics()
 # EOF
