@@ -1,0 +1,80 @@
+{
+	u'EMC': {
+		'val': 0
+	}, 
+	'TEMP': {
+		u'AO': 39.5, 
+		u'PMIC': 100.0, 
+		u'thermal': 31.75, 
+		u'GPU': 31.0, 
+		u'PLL': 31.0, 
+		u'CPU': 32.5
+	}, 
+	'RAM': {'use': 1643, 'unit': u'M', 'tot': 3956, 'lfb': {'nblock': 309, 'unit': u'M', 'size': 4}
+}, 
+	u'GR3D': {
+		'val': 0
+	}, 
+	'FAN': {
+		'status': 'ON', 
+		'ctrl': True, 
+		'cap': 255, 
+		'tpwm': 0, 
+		'step': 100, 
+		'cpwm': 0
+	}, 
+	'SWAP': {
+		'cached': {
+			'unit': u'M', 
+			'size': 0
+		}, 
+		'use': 0, 
+		'unit': u'M', 
+		'tot': 1978
+	}, 
+	WATT': {
+		u'POM_5V_CPU': {
+			'avg': 223, 
+			'cur': 123
+		}, 
+		u'POM_5V_IN': {
+			'avg': 2080, 
+			'cur': 1931
+		}, 
+		u'POM_5V_GPU': {
+			'avg': 83, 
+			'cur': 82
+		}
+	}, 
+	'CPU': [
+		{
+			'status': 'ON', 
+			'frq': 102, 
+			'name': 'CPU1', 
+			'val': 17, 
+			'governor': 'schedutil'
+		}, 
+		{
+			'status': 'ON', 
+			'frq': 102, 
+			'name': 'CPU2', 
+			'val': 12, 
+			'governor': 'schedutil'
+		}, 
+		{
+			'status': 'ON', 
+			'frq': 102, 
+			'name': 'CPU3', 
+			'val': 13, 
+			'governor': 'schedutil'
+		}, 
+		{
+			'status': 'ON', 
+			'frq': 102, 
+			'name': 'CPU4', 
+			'val': 13, 
+			'governor': 'schedutil'
+		}
+	]
+}
+
