@@ -18,6 +18,7 @@
 
 from jtop import jtop
 import time
+from enumComponent import EnumComponent
 
 class JetsonNanoStatistics:
     def __init__(self):
@@ -28,7 +29,7 @@ class JetsonNanoStatistics:
                 print(self.getAveragePowerConsumptionInMilliwattsForCPU())
 
     def getAveragePowerConsumptionInMilliwattsForCPU(self):
-        return self.__powerConsumptionInMilliwatts[u'POM_5V_CPU']['avg']
+        return self.__powerConsumptionInMilliwatts['POM_5V_CPU']['avg']
 		
 """
 if __name__ == "__main__":
