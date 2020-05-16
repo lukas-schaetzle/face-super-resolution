@@ -18,7 +18,7 @@
 
 from jtop import jtop
 import time
-from enumComponent import EnumComponent
+from enumComponent import Component
 
 class JetsonNanoStatistics:
     def __init__(self):
@@ -26,10 +26,10 @@ class JetsonNanoStatistics:
             while True:
                 self.__powerConsumptionInMilliwatts = jetson.stats["WATT"]
 	       # print("I'm the energy " + self.__temperature)
-                print(self.getAveragePowerConsumptionInMilliwattsFor(EnumComponent.CPU.value))
+                print(self.getAveragePowerConsumptionInMilliwattsFor(Component.CPU.value))
 
     """
-    component - every possible component listet in EnumComponent, e.g. EnumComponent.CPU.value to get the value of CPU
+    component - every possible component listed in enumComponent, e.g. EnumComponent.CPU.value to get the value of CPU
     """
     def getAveragePowerConsumptionInMilliwattsFor(self, component):
         return self.__powerConsumptionInMilliwatts[component]['avg']
