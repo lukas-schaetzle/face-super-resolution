@@ -29,7 +29,7 @@ class JetsonNanoStatistics:
                 print(self.getAveragePowerConsumptionInMilliwattsForCPU())
 
     def getAveragePowerConsumptionInMilliwattsForCPU(self):
-        return self.__powerConsumptionInMilliwatts['POM_5V_CPU']['avg']
+        return self.__powerConsumptionInMilliwatts[EnumComponent.CPU.value]['avg']
 		
 """
 if __name__ == "__main__":
