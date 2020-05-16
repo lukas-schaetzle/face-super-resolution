@@ -26,10 +26,13 @@ class JetsonNanoStatistics:
             while True:
                 self.__powerConsumptionInMilliwatts = jetson.stats["WATT"]
 	       # print("I'm the energy " + self.__temperature)
-                print(self.getAveragePowerConsumptionInMilliwattsForCPU())
+                print(self.getAveragePowerConsumptionInMilliwattsFor(EnumComponent.CPU.value))
 
-    def getAveragePowerConsumptionInMilliwattsForCPU(self):
-        return self.__powerConsumptionInMilliwatts[EnumComponent.CPU.value]['avg']
+    """
+    component - every possible component listet in EnumComponent, e.g. EnumComponent.CPU.value to get the value of CPU
+    """
+    def getAveragePowerConsumptionInMilliwattsFor(self, component):
+        return self.__powerConsumptionInMilliwatts[component]['avg']
 		
 """
 if __name__ == "__main__":
