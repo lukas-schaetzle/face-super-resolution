@@ -1,3 +1,5 @@
+# install package jetson stats:  sudo -H pip install -U jetson-stats
+
 from jtop import jtop
 import time
 from enumComponent import Component
