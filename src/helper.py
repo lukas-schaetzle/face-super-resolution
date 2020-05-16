@@ -11,3 +11,13 @@ def clearLayout(layout):
     child = layout.takeAt(0)
     if child.widget():
       child.widget().deleteLater()
+
+
+class ResultImages:
+  def __init__(self, frame=None, frame_annotated=None, super_faces=[]):
+    self.current_frame = frame
+    self.current_frame_annotated = frame_annotated
+    self.super_res_faces = super_faces
+
+  def get_current_frame(self, with_annotations=True):
+    return self.current_frame_annotated if with_annotations else self.current_frame
