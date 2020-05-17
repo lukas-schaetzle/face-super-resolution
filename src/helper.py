@@ -1,4 +1,4 @@
-import os
+import os, platform
 
 def getPath(*args):
   dirname = os.path.dirname(os.path.realpath(__file__))
@@ -11,6 +11,9 @@ def clearLayout(layout):
     child = layout.takeAt(0)
     if child.widget():
       child.widget().deleteLater()
+
+def running_on_jetson_nano():
+  return platform.machine() == "aarch64"
 
 
 class ResultImages:

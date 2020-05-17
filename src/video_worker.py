@@ -8,7 +8,8 @@ from timeit import default_timer as timer
 from test import Test
 
 class VideoWorker(QObject):
-  sig_fps = pyqtSignal(str) 
+  sig_fps = pyqtSignal(str)
+  sig_video_end = pyqtSignal()
   sig_next_frame = pyqtSignal(ResultImages)
 
   def __init__(self, video_source=0, *args, **kwargs):
@@ -26,6 +27,7 @@ class VideoWorker(QObject):
  
     self.width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)
     self.height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    self.read_failed = False
     self.current_frame = None
     self.current_frame_annotated = None
     self.super_res_faces = [QtGui.QPixmap(getPath("assets", "test.png")) for x in range(4)]
@@ -38,14 +40,10 @@ class VideoWorker(QObject):
     #   self.t[-1].start()
 
     self._last_timer_value = timer()
-    while (not self._abort):
-      # TODO: stop when video file finished
+    while ((not self._abort) and (not self.read_failed)):
       self.next_frame()
       self.calculate_fps()
-
       QtCore.QCoreApplication.processEvents()
-
-    print("Thread stopped properly") # TODO: remove debug msg
 
   def calculate_fps(self):
     current_time = timer()
@@ -67,9 +65,9 @@ class VideoWorker(QObject):
         # self.draw_rect(annotatedFrame, (20, 20), (100, 100), "1")
 
         # for x in range(59999999):
-        #   z = 1 + 1
+        #   pass
 
-        face_locations = face_recognition.face_locations(annotatedFrame)
+        face_locations = face_recognition.face_locations(annotatedFrame, model="hog")
         for (top, right, bottom, left) in face_locations:
           self.draw_rect(annotatedFrame, (left, top), (right, bottom), "test")
 
@@ -79,6 +77,10 @@ class VideoWorker(QObject):
 
         if (not self._abort):
           self.sig_next_frame.emit(ResultImages(self.current_frame, self.current_frame_annotated, self.super_res_faces))
+
+      else:
+        self.read_failed = True
+        self.sig_video_end.emit()
     
   def draw_rect(self, img, origin, end, descr, color=(18, 156, 243)):
     cv2.rectangle(img, origin, end, color, 2)

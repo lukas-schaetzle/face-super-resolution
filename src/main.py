@@ -1,11 +1,13 @@
 import sys, os, time, cv2
-from helper import clearLayout, getPath, ResultImages
+from helper import clearLayout, getPath, ResultImages, running_on_jetson_nano
 from scaling_pixmap import ScalingPixmapLabel
 from video_worker import VideoWorker
 from flow_layout import JFlowLayout
 from PyQt5 import QtWidgets, QtGui, QtCore, uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
+
+GSTREAMER_PIPELINE = 'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=1280, height=720, format=(string)NV12, framerate=21/1 ! nvvidconv flip-method=0 ! video/x-raw, width=1280, height=720, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
 
 class MainWindow(QMainWindow):
   STATUSBAR_DISPLAY_TIME = 3500
@@ -54,18 +56,26 @@ class MainWindow(QMainWindow):
       self.vid_worker[1].quit()
 
   def use_camera(self):
-    self.setup_video_worker()
-    self.statusbar.showMessage("Using camera feed", self.STATUSBAR_DISPLAY_TIME)
-    # TODO: self.show_statusbar_error("Could not get camera feed")
+    try:
+      if running_on_jetson_nano():
+        self.setup_video_worker(GSTREAMER_PIPELINE, cv2.CAP_GSTREAMER)
+      else:
+        self.setup_video_worker(0)
+
+      self.statusbar.showMessage("Using camera feed", self.STATUSBAR_DISPLAY_TIME)
+    except:
+      self.show_statusbar_error("Could not get camera feed")
 
   def open_file(self):
     file_name, _ = QFileDialog.getOpenFileName(self, "Open video", "", "All Files (*);;Movie Files (*.mp4 *.avi)")
     # TODO: Add supported file formats
 
     if (file_name):
-      self.setup_video_worker(file_name)
-      self.statusbar.showMessage("Opened file " + file_name, self.STATUSBAR_DISPLAY_TIME)
-      # TODO: self.show_statusbar_error("Could not open file")
+      try:
+        self.setup_video_worker(file_name)
+        self.statusbar.showMessage("Opened file " + file_name, self.STATUSBAR_DISPLAY_TIME)
+      except:
+        self.show_statusbar_error("Could not open file")
 
   def setup_video_worker(self, *args, **kwargs):
     self.stop_video_processor()
@@ -77,6 +87,7 @@ class MainWindow(QMainWindow):
 
     worker.sig_fps.connect(self.update_fps_display)
     worker.sig_next_frame.connect(self.update_images)
+    worker.sig_video_end.connect(self.handle_video_end)
     self.sig_abort_worker.connect(worker.abort)
 
     thread.started.connect(worker.work)
@@ -135,6 +146,11 @@ class MainWindow(QMainWindow):
 
   def show_statusbar_error(self, msg):
     self.statusbar.showMessage("ERROR: " + msg, self.STATUSBAR_DISPLAY_TIME)
+
+  @pyqtSlot()
+  def handle_video_end(self):
+    self.statusbar.showMessage("Video feed ended", self.STATUSBAR_DISPLAY_TIME)
+    self.reset_fps_display
 
   def closeEvent(self, event):
     event.accept()

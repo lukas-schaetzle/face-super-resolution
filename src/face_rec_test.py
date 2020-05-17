@@ -34,7 +34,6 @@ def draw_fps(img):
 while(True):
   ret, frame = cap.read()
 
-  frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
   face_locations = face_recognition.face_locations(frame)
   for (top, right, bottom, left) in face_locations:
     draw_rect(frame, (left, top), (right, bottom), "test")
