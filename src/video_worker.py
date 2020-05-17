@@ -1,9 +1,9 @@
-import threading, time, cv2, face_recognition
+import threading, time, cv2, jetson.inference, jetson.utils
 from PyQt5 import QtGui, QtCore
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QThread
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 from helper import getPath, ResultImages
 from timeit import default_timer as timer
-from test import Test
+import numpy as np
 
 class VideoWorker(QObject):
   sig_fps = pyqtSignal(str) 
@@ -28,13 +28,10 @@ class VideoWorker(QObject):
     self.current_frame_annotated = None
     self.super_res_faces = [QtGui.QPixmap(getPath("assets", "test.png")) for x in range(4)]
 
+    self.net = jetson.inference.detectNet("ssd-mobilenet-v2", threshold=0.5)
+
   @pyqtSlot()
   def work(self):
-    # self.t = []
-    # for x in range(20):
-    #   self.t.append(Test())
-    #   self.t[-1].start()
-
     self._last_timer_value = timer()
     while (not self._abort):
       # TODO: stop when video file finished
@@ -62,16 +59,15 @@ class VideoWorker(QObject):
       
       if ret:
         annotatedFrame = frame.copy()
-        # self.draw_rect(annotatedFrame, (20, 20), (100, 100), "1")
-
-        # for x in range(59999999):
-        #   z = 1 + 1
-
-        face_locations = face_recognition.face_locations(annotatedFrame)
-        for (top, right, bottom, left) in face_locations:
-          self.draw_rect(annotatedFrame, (left, top), (right, bottom), "test")
 
         self.current_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        img = cv2.cvtColor(self.current_frame, cv2.COLOR_RGB2RGBA).astype(np.float32)
+        img = jetson.utils.cudaFromNumpy(img)
+
+        face_locations = net.Detect(img, self.width, self.height, False)
+        for face in face_locations:
+          self.draw_rect(annotatedFrame, (face.Left, face.Top), (face.Right, face.Bottom), "test")
+
         self.current_frame_annotated = cv2.cvtColor(annotatedFrame, cv2.COLOR_BGR2RGB)
         self._frame_counter += 1
 

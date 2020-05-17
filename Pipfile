@@ -9,3 +9,4 @@ verify_ssl = true
 opencv-python = "*"
 pyqt5 = "*"
 face-recognition = "*"
+numpy = "*"
