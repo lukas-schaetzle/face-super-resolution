@@ -64,7 +64,7 @@ class VideoWorker(QObject):
         img = cv2.cvtColor(self.current_frame, cv2.COLOR_RGB2RGBA).astype(np.float32)
         img = jetson.utils.cudaFromNumpy(img)
 
-        face_locations = net.Detect(img, self.width, self.height, False)
+        face_locations = self.net.Detect(img, self.width, self.height, False)
         for face in face_locations:
           self.draw_rect(annotatedFrame, (face.Left, face.Top), (face.Right, face.Bottom), "test")
 
