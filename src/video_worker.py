@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import threading, time, cv2, face_recognition
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QThread
