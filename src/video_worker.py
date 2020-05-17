@@ -29,6 +29,13 @@ class VideoWorker(QObject):
     self.super_res_faces = [QtGui.QPixmap(getPath("assets", "test.png")) for x in range(4)]
 
     self.net = jetson.inference.detectNet("ssd-mobilenet-v2", threshold=0.5)
+    self.cam = jetson.utils.gstCamera(640, 360, "/dev/video0")
+
+while display.IsOpen():
+	# returns image
+	img, width, height = camera.CaptureRGBA()
+	# the detection network processes the image
+	detections = net.Detect(img, width, height)
 
   @pyqtSlot()
   def work(self):
@@ -54,25 +61,20 @@ class VideoWorker(QObject):
         self.sig_fps.emit('%.2f'%(self.fps))
 
   def next_frame(self):
-    if self.vid.isOpened():
-      ret, frame = self.vid.read()
-      
-      if ret:
-        annotatedFrame = frame.copy()
+    img, width, height = self.cam.CaptureRGBA()
+	  face_locations = net.Detect(img, width, height)
 
-        self.current_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        img = cv2.cvtColor(self.current_frame, cv2.COLOR_RGB2RGBA).astype(np.float32)
-        img = jetson.utils.cudaFromNumpy(img)
+    for face in face_locations:
+      print(face_locations)
+    
+    img = jetson.utils.cudaToNumpy(img, width, height, 4)
+    img = cv2.cvtColor(img, cv2.COLOR_RGBA2RGB).astype(np.uint8)
+    self.current_frame = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    self.current_frame_annotated = self.current_frame
+    self._frame_counter += 1
 
-        face_locations = self.net.Detect(img, self.width, self.height)
-        for face in face_locations:
-          print(face_locations)
-
-        self.current_frame_annotated = cv2.cvtColor(annotatedFrame, cv2.COLOR_BGR2RGB)
-        self._frame_counter += 1
-
-        if (not self._abort):
-          self.sig_next_frame.emit(ResultImages(self.current_frame, self.current_frame_annotated, self.super_res_faces))
+    if (not self._abort):
+      self.sig_next_frame.emit(ResultImages(self.current_frame, self.current_frame_annotated, self.super_res_faces))
     
   def draw_rect(self, img, origin, end, descr, color=(18, 156, 243)):
     cv2.rectangle(img, origin, end, color, 2)
