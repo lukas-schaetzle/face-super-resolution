@@ -1,8 +1,9 @@
 import threading, time, cv2, face_recognition
 from PyQt5 import QtGui, QtCore
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QThread
 from helper import getPath, ResultImages
 from timeit import default_timer as timer
+from test import Test
 
 class VideoWorker(QObject):
   sig_fps = pyqtSignal(str) 
@@ -29,6 +30,12 @@ class VideoWorker(QObject):
 
   @pyqtSlot()
   def work(self):
+    QThread.currentThread().setPriority(QThread.LowestPriority)
+    # self.t = []
+    # for x in range(20):
+    #   self.t.append(Test())
+    #   self.t[-1].start()
+
     self._last_timer_value = timer()
     while (not self._abort):
       # TODO: stop when video file finished

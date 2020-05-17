@@ -143,4 +143,5 @@ class MainWindow(QMainWindow):
 app = QApplication(sys.argv)
 window = MainWindow()
 window.show()
+QThread.currentThread().setPriority(QThread.TimeCriticalPriority)
 sys.exit(app.exec())
