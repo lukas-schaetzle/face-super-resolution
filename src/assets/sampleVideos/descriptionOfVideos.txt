@@ -1,0 +1,13 @@
+Source: http://groups.inf.ed.ac.uk/vision/CAVIAR/CAVIARDATA1/
+
+Meet_Crowd
+-> Crowd of four people meet, walk and split
+
+WalkByShop1cor
+-> Couple walking along corridor browsing, persons going inside and coming out of stores
+
+Fight_Chase
+-> Two people meet, fight and chase each other
+
+Browse1
+-> Person browsing back and forth
