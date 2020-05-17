@@ -14,6 +14,7 @@ class MainWindow(QMainWindow):
 
   def __init__(self):
     super().__init__()
+    QThread.currentThread().setPriority(QThread.TimeCriticalPriority)
     self.setWindowIcon(QtGui.QIcon(getPath("assets", "icon.png")))
 
     uic.loadUi(getPath("assets", "main.ui"), self)
@@ -79,7 +80,7 @@ class MainWindow(QMainWindow):
     self.sig_abort_worker.connect(worker.abort)
 
     thread.started.connect(worker.work)
-    thread.start() 
+    thread.start(QThread.IdlePriority) 
 
   def snapshot(self):
     try:
@@ -143,5 +144,4 @@ class MainWindow(QMainWindow):
 app = QApplication(sys.argv)
 window = MainWindow()
 window.show()
-QThread.currentThread().setPriority(QThread.TimeCriticalPriority)
 sys.exit(app.exec())

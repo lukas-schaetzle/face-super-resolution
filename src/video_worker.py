@@ -30,7 +30,6 @@ class VideoWorker(QObject):
 
   @pyqtSlot()
   def work(self):
-    QThread.currentThread().setPriority(QThread.LowestPriority)
     # self.t = []
     # for x in range(20):
     #   self.t.append(Test())
@@ -64,6 +63,9 @@ class VideoWorker(QObject):
       if ret:
         annotatedFrame = frame.copy()
         # self.draw_rect(annotatedFrame, (20, 20), (100, 100), "1")
+
+        # for x in range(59999999):
+        #   z = 1 + 1
 
         face_locations = face_recognition.face_locations(annotatedFrame)
         for (top, right, bottom, left) in face_locations:
