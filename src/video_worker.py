@@ -18,7 +18,7 @@ class VideoWorker(QObject):
     self._last_timer_value = None
     self.fps = None
 
-    self.vid = cv2.VideoCapture(video_source)
+    self.vid = None
     if not self.vid.isOpened():
       raise ValueError("Unable to open video source", video_source)
  
