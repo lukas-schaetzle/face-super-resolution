@@ -31,12 +31,6 @@ class VideoWorker(QObject):
     self.net = jetson.inference.detectNet("ssd-mobilenet-v2", threshold=0.5)
     self.cam = jetson.utils.gstCamera(640, 360, "/dev/video0")
 
-while display.IsOpen():
-	# returns image
-	img, width, height = camera.CaptureRGBA()
-	# the detection network processes the image
-	detections = net.Detect(img, width, height)
-
   @pyqtSlot()
   def work(self):
     self._last_timer_value = timer()
