@@ -19,9 +19,6 @@ class VideoWorker(QObject):
     self.fps = None
 
     self.vid = None
- 
-    self.width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)
-    self.height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
     self.current_frame = None
     self.current_frame_annotated = None
     self.super_res_faces = [QtGui.QPixmap(getPath("assets", "test.png")) for x in range(4)]
