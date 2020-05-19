@@ -19,8 +19,6 @@ class VideoWorker(QObject):
     self.fps = None
 
     self.vid = None
-    if not self.vid.isOpened():
-      raise ValueError("Unable to open video source", video_source)
  
     self.width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)
     self.height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
