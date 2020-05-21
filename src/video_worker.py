@@ -1,69 +1,110 @@
-#!/usr/bin/env python3
-
-import threading, time, cv2, face_recognition
-from PyQt5 import QtGui, QtCore
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QThread
-from helper import getPath, ResultImages
+import threading, time, cv2, face_recognition, multiprocessing
+from helper import getNextEvents, ResultImages, SndTopic, RcvTopic, QueueMsg, getPath
 from timeit import default_timer as timer
-from test import Test
 
-class VideoWorker(QObject):
-  sig_fps = pyqtSignal(str)
-  sig_video_end = pyqtSignal()
-  sig_next_frame = pyqtSignal(ResultImages)
+def use_worker(send_queue, recv_queue):
+  send_queue.cancel_join_thread()
+  recv_queue.cancel_join_thread()
 
-  def __init__(self, video_source=0, *args, **kwargs):
-    super().__init__(*args, **kwargs)
+  vid_worker = VideoWorker(send_queue, recv_queue)
+  vid_worker.work()
 
-    self._abort = False
+class VideoProcessInterface():
+  def __init__(self, send_queue, recv_queue):
+    self.send_queue = send_queue
+    self.recv_queue = recv_queue
+    self.process = multiprocessing.Process(target=use_worker, args=(recv_queue, send_queue))
 
-    self._frame_counter = 0
-    self._last_timer_value = None
-    self.fps = None
+class VideoWorker():
+  FPS_INTERVAL = 1.5 # in seconds
+  IDLE_SLEEP_TIME = 0.1 # in seconds
+  GSTREAMER_PIPELINE = 'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=1280, height=720, format=(string)NV12, framerate=21/1 ! nvvidconv flip-method=0 ! video/x-raw, width=1280, height=720, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
 
-    self.vid = cv2.VideoCapture(video_source)
-    if not self.vid.isOpened():
-      raise ValueError("Unable to open video source", video_source)
- 
-    self.width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)
-    self.height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
-    self.read_failed = False
-    self.current_frame = None
-    self.current_frame_annotated = None
-    self.super_res_faces = [QtGui.QPixmap(getPath("assets", "test.png")) for x in range(4)]
-
-  @pyqtSlot()
+  def __init__(self, send_queue, recv_queue):
+    self.send_queue = send_queue
+    self.recv_queue = recv_queue
+    self.abort = False
+    self.vid = None
+    
   def work(self):
-    # self.t = []
-    # for x in range(20):
-    #   self.t.append(Test())
-    #   self.t[-1].start()
+    while (not self.abort):
+      if (self.vid):
+        self.next_frame()
+        self.calculate_fps()
+      else:
+        time.sleep(self.IDLE_SLEEP_TIME)
+      self.handle_incoming_msg()
 
-    self._last_timer_value = timer()
-    while ((not self._abort) and (not self.read_failed)):
-      self.next_frame()
-      self.calculate_fps()
-      QtCore.QCoreApplication.processEvents()
+  def handle_incoming_msg(self):
+    messages = getNextEvents(self.recv_queue)
+    for msg in messages:
+      if (msg.topic == RcvTopic.KILL):
+        self.abort = True
+      elif (msg.topic == RcvTopic.USE_CAMERA):
+        self.use_camera()
+      elif (msg.topic == RcvTopic.OPEN_FILE):
+        self.open_file(msg.content)
+      elif (msg.topic == RcvTopic.END_VID):
+        self.end_video()
+      else:
+        print("No endpoint for event topic {topic}".format(topic=msg.topic))
+
+  def use_camera(self):
+    access_success = True
+
+    try:
+      print("Trying to use standard camera")
+      self.new_video(0)
+    except ValueError:
+      try:
+        print("Trying to use gStreamer camera")
+        self.new_video(self.GSTREAMER_PIPELINE, cv2.CAP_GSTREAMER)
+      except ValueError:
+        access_success = False
+
+    if (self.vid.read() and access_success):
+      self.send_queue.put_nowait(QueueMsg(SndTopic.MSG, "Using camera feed"))
+    else:
+      self.send_queue.put_nowait(QueueMsg(SndTopic.MSG_ERROR, "Could not use camera"))
+      self.vid = None
+
+  def open_file(self, filename):
+    print(filename)
+    try:
+      self.new_video(filename)
+      self.send_queue.put_nowait(QueueMsg(SndTopic.MSG, "Using file " + filename))
+    except ValueError:
+      self.send_queue.put_nowait(QueueMsg(SndTopic.MSG_ERROR, "Could not open file " + filename))
+      
+  def new_video(self, video_source):
+    self.vid = cv2.VideoCapture(video_source)
+    if (not (self.vid and self.vid.isOpened())):
+      self.vid = None
+      raise ValueError("Unable to open video source")
+    
+    self.frame_counter = 0
+    self.last_timer_value = timer()
 
   def calculate_fps(self):
     current_time = timer()
-    time_since_last_calc = current_time - self._last_timer_value
-    if (time_since_last_calc >= 1.5):
-      self.fps = self._frame_counter / time_since_last_calc
-      self._last_timer_value = current_time
-      self._frame_counter = 0
+    time_since_last_calc = current_time - self.last_timer_value
+    if (time_since_last_calc >= self.FPS_INTERVAL):
+      self.fps = self.frame_counter / time_since_last_calc
+      self.last_timer_value = current_time
+      self.frame_counter = 0
 
-      if (not self._abort):
-        self.sig_fps.emit('%.2f'%(self.fps))
+      if (not self.abort):
+        self.send_queue.put_nowait(QueueMsg(
+          SndTopic.FPS,
+          "{fps:.2f}".format(fps=self.fps)
+        ))
 
   def next_frame(self):
-    if self.vid.isOpened():
+    if (self.vid and self.vid.isOpened()):
       ret, frame = self.vid.read()
       
       if ret:
         annotatedFrame = frame.copy()
-        # self.draw_rect(annotatedFrame, (20, 20), (100, 100), "1")
-
         # for x in range(59999999):
         #   pass
 
@@ -73,14 +114,17 @@ class VideoWorker(QObject):
 
         self.current_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         self.current_frame_annotated = cv2.cvtColor(annotatedFrame, cv2.COLOR_BGR2RGB)
-        self._frame_counter += 1
+        self.super_res_faces = []
+        self.frame_counter += 1
 
-        if (not self._abort):
-          self.sig_next_frame.emit(ResultImages(self.current_frame, self.current_frame_annotated, self.super_res_faces))
+        if (not self.abort):
+          self.send_queue.put_nowait(QueueMsg(
+            SndTopic.NEXT_FRAME,
+            ResultImages(self.current_frame, self.current_frame_annotated, self.super_res_faces)
+          ))
 
       else:
-        self.read_failed = True
-        self.sig_video_end.emit()
+        self.end_video()
     
   def draw_rect(self, img, origin, end, descr, color=(18, 156, 243)):
     cv2.rectangle(img, origin, end, color, 2)
@@ -90,6 +134,6 @@ class VideoWorker(QObject):
     cv2.rectangle(img, origin, (origin[0] + text_width, origin[1] + text_height), color, cv2.FILLED)
     cv2.putText(img, descr, (origin[0], origin[1] + text_height - baseline), cv2.FONT_ITALIC, 0.5, (255, 255, 255), 1)
 
-  @pyqtSlot()
-  def abort(self):
-    self._abort = True
+  def end_video(self):
+    self.vid = None
+    self.send_queue.put_nowait(QueueMsg(SndTopic.VIDEO_END))
