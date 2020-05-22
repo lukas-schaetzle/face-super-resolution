@@ -1,6 +1,17 @@
-import os, platform
+import os, platform, cv2
 from enum import Enum
 from queue import Empty as EmptyError
+
+def upscaleTuple(scale_factor, tuple_inp):
+  return tuple(int(round(scale_factor * x)) for x in tuple_inp) 
+
+def resizeImage(cv_img, max_width, max_height):
+  height, width = cv_img.shape[:2]
+
+  h_ratio = max_height / height
+  w_ratio = max_width / width
+  scale_factor = min(h_ratio, w_ratio)
+  return cv2.resize(cv_img, (0,0), fx=scale_factor, fy=scale_factor), scale_factor
 
 def getPath(*args):
   dirname = os.path.dirname(os.path.realpath(__file__))

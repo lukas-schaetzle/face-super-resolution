@@ -9,7 +9,7 @@ from PyQt5.QtCore import pyqtSlot
 
 class MainWindow(QMainWindow):
   STATUSBAR_DISPLAY_TIME = 3500 # in ms
-  EVENT_TIMER = 100 # in ms
+  EVENT_TIMER = 10 # in ms
   MAX_CLEANUP_WAIT = 2 # in s
 
   def __init__(self):

@@ -1,5 +1,5 @@
 import threading, time, cv2, face_recognition, multiprocessing
-from helper import getNextEvents, ResultImages, SndTopic, RcvTopic, QueueMsg, getPath
+from helper import getNextEvents, ResultImages, SndTopic, RcvTopic, QueueMsg, getPath, resizeImage, upscaleTuple
 from timeit import default_timer as timer
 
 def use_worker(send_queue, recv_queue):
@@ -108,9 +108,17 @@ class VideoWorker():
         # for x in range(59999999):
         #   pass
 
-        face_locations = face_recognition.face_locations(annotatedFrame, model="hog")
-        for (top, right, bottom, left) in face_locations:
-          self.draw_rect(annotatedFrame, (left, top), (right, bottom), "test")
+        small_frame, scale_factor = resizeImage(frame, 640, 360)
+        reverse_scale_factor = 1 / scale_factor
+        face_locations = face_recognition.face_locations(small_frame, model="hog")
+        print(enumerate(face_locations))
+        for index, (top, right, bottom, left) in enumerate(face_locations, 1):
+          self.draw_rect(
+            annotatedFrame,
+            upscaleTuple(reverse_scale_factor, (left, top)),
+            upscaleTuple(reverse_scale_factor, (right, bottom)),
+            index
+          )
 
         self.current_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         self.current_frame_annotated = cv2.cvtColor(annotatedFrame, cv2.COLOR_BGR2RGB)
@@ -129,6 +137,7 @@ class VideoWorker():
   def draw_rect(self, img, origin, end, descr, color=(18, 156, 243)):
     cv2.rectangle(img, origin, end, color, 2)
 
+    descr = str(descr)
     (text_width, text_height), baseline = cv2.getTextSize(descr, cv2.FONT_ITALIC, 0.5, 1)
     text_height += baseline
     cv2.rectangle(img, origin, (origin[0] + text_width, origin[1] + text_height), color, cv2.FILLED)
