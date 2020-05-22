@@ -105,13 +105,9 @@ class VideoWorker():
       
       if ret:
         annotatedFrame = frame.copy()
-        # for x in range(59999999):
-        #   pass
-
         small_frame, scale_factor = resizeImage(frame, 640, 360)
         reverse_scale_factor = 1 / scale_factor
         face_locations = face_recognition.face_locations(small_frame, model="hog")
-        print(enumerate(face_locations))
         for index, (top, right, bottom, left) in enumerate(face_locations, 1):
           self.draw_rect(
             annotatedFrame,
