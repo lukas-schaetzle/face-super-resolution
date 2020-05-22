@@ -50,7 +50,7 @@ class VideoWorker(QObject):
         self.sig_fps.emit('%.2f'%(self.fps))
 
   def next_frame(self):
-    img, width, height = self.cam.CaptureRGBA()
+    img, width, height = self.cam.CaptureRGBA(zeroCopy=1)
     face_locations = self.net.Detect(img, width, height)
 
     for face in face_locations:
