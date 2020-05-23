@@ -1,6 +1,13 @@
 import os, platform, cv2
 from enum import Enum
 from queue import Empty as EmptyError
+from PyQt5 import QtGui
+
+def transformToPixmap(cv_img):
+  height, width, channel = cv_img.shape
+  bytesPerLine = 3 * width
+  q_img = QtGui.QImage(cv_img.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888)
+  return QtGui.QPixmap(q_img)
 
 def upscaleTuple(scale_factor, tuple_inp):
   return tuple(int(round(scale_factor * x)) for x in tuple_inp) 

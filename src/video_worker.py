@@ -25,6 +25,10 @@ class VideoWorker():
     self.recv_queue = recv_queue
     self.abort = False
     self.vid = None
+
+    # TODO: Consider improvement with Pytorch: check for torch.cuda.is_available()
+    # self.model = "cnn"
+    self.model = "hog"
     
   def work(self):
     while (not self.abort):
@@ -107,7 +111,8 @@ class VideoWorker():
         annotatedFrame = frame.copy()
         small_frame, scale_factor = resizeImage(frame, 640, 360)
         reverse_scale_factor = 1 / scale_factor
-        face_locations = face_recognition.face_locations(small_frame, model="hog")
+        face_locations = face_recognition.face_locations(small_frame, model=self.model)
+        self.super_res_faces = []
         for index, (top, right, bottom, left) in enumerate(face_locations, 1):
           self.draw_rect(
             annotatedFrame,
@@ -115,10 +120,11 @@ class VideoWorker():
             upscaleTuple(reverse_scale_factor, (right, bottom)),
             index
           )
+          # TODO
+          self.super_res_faces.append([cv2.imread(getPath("assets", "test.png")) for x in range(2)])
 
         self.current_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         self.current_frame_annotated = cv2.cvtColor(annotatedFrame, cv2.COLOR_BGR2RGB)
-        self.super_res_faces = []
         self.frame_counter += 1
 
         if (not self.abort):
@@ -130,14 +136,14 @@ class VideoWorker():
       else:
         self.end_video()
     
-  def draw_rect(self, img, origin, end, descr, color=(18, 156, 243)):
+  def draw_rect(self, img, origin, end, descr, color=(255, 134, 30)):
     cv2.rectangle(img, origin, end, color, 2)
 
     descr = str(descr)
-    (text_width, text_height), baseline = cv2.getTextSize(descr, cv2.FONT_ITALIC, 0.5, 1)
+    (text_width, text_height), baseline = cv2.getTextSize(descr, cv2.FONT_ITALIC, 1, 2)
     text_height += baseline
     cv2.rectangle(img, origin, (origin[0] + text_width, origin[1] + text_height), color, cv2.FILLED)
-    cv2.putText(img, descr, (origin[0], origin[1] + text_height - baseline), cv2.FONT_ITALIC, 0.5, (255, 255, 255), 1)
+    cv2.putText(img, descr, (origin[0], origin[1] + text_height - int(baseline/2)), cv2.FONT_ITALIC, 1, (255, 255, 255), 2)
 
   def end_video(self):
     self.vid = None

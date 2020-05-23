@@ -1,11 +1,12 @@
 import sys, os, time, cv2, multiprocessing
-from helper import clearLayout, getPath, getNextEvents, ResultImages, SndTopic, RcvTopic, QueueMsg
+from super_res_face_widget import FaceSetContainer
+from helper import clearLayout, getPath, getNextEvents, ResultImages, SndTopic, RcvTopic, QueueMsg, transformToPixmap
 from scaling_pixmap import ScalingPixmapLabel
 from video_worker import VideoProcessInterface
 from flow_layout import JFlowLayout
 from PyQt5 import QtWidgets, QtGui, QtCore, uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, Qt
 
 class MainWindow(QMainWindow):
   STATUSBAR_DISPLAY_TIME = 3500 # in ms
@@ -45,8 +46,10 @@ class MainWindow(QMainWindow):
     self.video_input = ScalingPixmapLabel()
     self.layout_video_input.addWidget(self.video_input)
 
-    self.super_faces_area = JFlowLayout()
+    self.super_faces_area = QtWidgets.QVBoxLayout()
+    self.super_faces_area.setAlignment(Qt.AlignTop)
     super_faces_area_widget.setLayout(self.super_faces_area)
+    self.face_sets = []
 
     self.action_close.triggered.connect(self.close)
     self.action_snapshot.triggered.connect(self.snapshot)
@@ -110,17 +113,25 @@ class MainWindow(QMainWindow):
       pix = QtGui.QPixmap.fromImage(img)
       self.video_input.setFullPixmap(pix)
 
-    # TODO
-    # clearLayout(self.super_faces_area)
-    # for face in self.result_images.super_res_faces:
-    #   container = QtWidgets.QWidget()
-    #   text_label = QtWidgets.QLabel()
-    #   text_label.setText("Face")
-    #   image_label = ScalingPixmapLabel(face)
-    #   container.setLayout(QtWidgets.QVBoxLayout())
-    #   container.layout().addWidget(text_label)
-    #   container.layout().addWidget(image_label)
-    #   self.super_faces_area.addWidget(container)
+    for index, face_set in enumerate(self.result_images.super_res_faces, 0):
+      current_number = index + 1
+      image_set = map(transformToPixmap, self.result_images.super_res_faces[index])
+
+      if len(self.face_sets) >= current_number:
+        self.face_sets[index].replace(image_set)
+      else:
+        container = FaceSetContainer(f"Face {current_number}:", image_set)
+        self.face_sets.append(container)
+        self.super_faces_area.addWidget(container)
+
+    target_number = len(self.result_images.super_res_faces)
+    current_number = len(self.face_sets)
+    if current_number > target_number:
+      for index in range(current_number-1, target_number-1, -1):
+        child = self.super_faces_area.takeAt(index)
+        if child and child.widget():
+          child.widget().deleteLater()
+        self.face_sets.pop()
 
   def update_fps_display(self, fps):
     self.fps_display.setText(fps)
