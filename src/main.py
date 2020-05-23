@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys, os, time, cv2, multiprocessing
 from super_res_face_widget import FaceSetContainer
 from helper import clearLayout, getPath, getNextEvents, ResultImages, SndTopic, RcvTopic, QueueMsg, transformToPixmap
@@ -12,6 +14,7 @@ class MainWindow(QMainWindow):
   STATUSBAR_DISPLAY_TIME = 3500 # in ms
   EVENT_TIMER = 10 # in ms
   MAX_CLEANUP_WAIT = 2 # in s
+  FACE_SET_NAMES = ["low_res", "super_res"]
 
   def __init__(self):
     super().__init__()
@@ -87,17 +90,26 @@ class MainWindow(QMainWindow):
 
   def snapshot(self):
     try:
-      path = "./snapshots/" + time.strftime("%d-%m-%Y-%H-%M-%S")
-      os.makedirs(path)
+      parent_path = "./snapshots/" + time.strftime("%d-%m-%Y-%H-%M-%S")
+      os.makedirs(parent_path)
       cv2.imwrite(
-        os.path.join(path , "input_video.jpg"),
+        os.path.join(parent_path , "input_video.jpg"),
         cv2.cvtColor(self.result_images.current_frame, cv2.COLOR_RGB2BGR)
       )
       cv2.imwrite(
-        os.path.join(path , "input_video_annotated.jpg"),
+        os.path.join(parent_path , "input_video_annotated.jpg"),
         cv2.cvtColor(self.result_images.current_frame_annotated, cv2.COLOR_RGB2BGR)
       )
-      # TODO: save super resolution faces
+
+      for index, face_set in enumerate(self.result_images.super_res_faces, 1):
+        path = os.path.join(parent_path , f"face_{index}")
+        os.makedirs(path)
+        for index, face in enumerate(face_set):
+          cv2.imwrite(
+            os.path.join(path , self.FACE_SET_NAMES[index] + ".jpg"),
+            cv2.cvtColor(face_set[0], cv2.COLOR_RGB2BGR)
+          )
+
     except OSError:
       self.show_statusbar_error("Snapshot could not be saved")
     else:
