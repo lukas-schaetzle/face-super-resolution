@@ -47,9 +47,6 @@ class VideoWorker(QObject):
     self.step = g_checkpoint['step']
     self.alpha = g_checkpoint['alpha']
     self.iteration = g_checkpoint['iteration']
-    self._16x16_down_sampling = transforms.Resize((16,16))
-    self._32x32_down_sampling = transforms.Resize((32, 32))
-    self._64x64_down_sampling = transforms.Resize((64, 64))
     self.totensor = transforms.Compose([transforms.ToTensor(),
                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
     print('pre-trained model is loaded step:%d, alpha:%d iteration:%d'%(self.step, self.alpha, self.iteration))
@@ -98,12 +95,11 @@ class VideoWorker(QObject):
         if (faceRect[2] - faceRect[0]) == (faceRect[3] - faceRect[1]):
           faceImg = img[faceRect[1]:faceRect[3], faceRect[0]:faceRect[2]]
           cv2.imwrite("face_" + imgIdName + ".jpg", faceImg)
-          smallFaceImg = cv2.resize(faceImg, (16, 16))
+          smallFaceImg = cv2.resize(faceImg, (16, 16), cv2.INTER_LANCZOS4)
           cv2.imwrite("smallFace_" + imgIdName + ".jpg", smallFaceImg)
 
           smallFaceImgPIL = Image.open("smallFace_" + imgIdName + ".jpg").convert('RGB')
-          biggerFaceImg = self._16x16_down_sampling(self._32x32_down_sampling(self._64x64_down_sampling(smallFaceImgPIL)))
-          biggerFaceImg = self.totensor(biggerFaceImg).unsqueeze(0).to(self.device)
+          biggerFaceImg = self.totensor(smallFaceImgPIL).unsqueeze(0).to(self.device)
           biggerFaceImg = self.generator(biggerFaceImg, self.step, self.alpha)
           utils.save_image(biggerFaceImg, "bigSmallFace_" + imgIdName + ".jpg")
 
@@ -118,7 +114,7 @@ class VideoWorker(QObject):
   def getFaceArea(self, face):
     sideLength = max(face.Width, face.Height)
     halfSideLength = sideLength / 2
-    newCenter = face.Center + (0, sideLength / 3)
+    newCenter = (face.Center[0], face.Center[1] + (sideLength / 8))
     return (max(0, int(newCenter[0] - halfSideLength)),
             max(0, int(newCenter[1] - halfSideLength)),
             min(self._camWidth, int(newCenter[0] + halfSideLength)),
