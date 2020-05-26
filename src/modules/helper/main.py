@@ -1,7 +1,8 @@
-import os, platform, cv2
+import os, platform, cv2, numpy, torchvision.transforms as transforms
 from enum import Enum
 from queue import Empty as EmptyError
 from PyQt5 import QtGui
+from PIL import Image
 
 def transformToPixmap(cv_img):
   height, width, channel = cv_img.shape
@@ -100,7 +101,10 @@ class FaceArea():
     self.bottom = bottom
 
 def downscale_to_16x16(img):
-  img_64, _ = resizeImage(img, 64, 64)
-  img_32, _ = resizeImage(img_64, 32, 32)
-  img_16, _ = resizeImage(img_32, 16, 16)
-  return img_16
+  _64x64_down_sampling = transforms.Resize((64, 64))
+  _32x32_down_sampling = transforms.Resize((32, 32))
+  _16x16_down_sampling = transforms.Resize((16,16))
+
+  pil_img = Image.fromarray(numpy.array(img))
+  downsized_pil_img = _16x16_down_sampling(_32x32_down_sampling(_64x64_down_sampling(pil_img)))
+  return numpy.array(downsized_pil_img)

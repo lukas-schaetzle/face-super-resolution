@@ -12,6 +12,6 @@ class FaceDetectionNet():
 
     faces = []
     for (top, right, bottom, left) in face_locations:
-      upscaled_coords = upscaleTuple(reverse_scale_factor, (left, top, right, bottom))
+      upscaled_coords = upscaleTuple(reverse_scale_factor, (left-20, top-20, right+20, bottom+20))
       faces.append(FaceArea(*upscaled_coords))
     return faces
