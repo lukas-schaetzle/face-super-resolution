@@ -1,11 +1,12 @@
-import threading, time, cv2, face_recognition, multiprocessing
-from helper import getNextEvents, ResultImages, SndTopic, RcvTopic, QueueMsg, getPath, resizeImage, upscaleTuple
+import threading, time, cv2, multiprocessing
+from modules.helper import *
+from modules.face_detection import FaceDetectionNet
+from modules.face_super_res import FaceSuperResolutionNet
 from timeit import default_timer as timer
 
 def use_worker(send_queue, recv_queue):
   send_queue.cancel_join_thread()
   recv_queue.cancel_join_thread()
-
   vid_worker = VideoWorker(send_queue, recv_queue)
   vid_worker.work()
 
@@ -25,12 +26,12 @@ class VideoWorker():
     self.recv_queue = recv_queue
     self.abort = False
     self.vid = None
-
-    # TODO: Consider improvement with Pytorch: check for torch.cuda.is_available()
-    # self.model = "cnn"
-    self.model = "hog"
+    self.face_detection_net = FaceDetectionNet()
+    self.face_super_res_net = FaceSuperResolutionNet()
     
   def work(self):
+    print("Worker initialized")
+
     while (not self.abort):
       if (self.vid):
         self.next_frame()
@@ -106,25 +107,21 @@ class VideoWorker():
   def next_frame(self):
     if (self.vid and self.vid.isOpened()):
       ret, frame = self.vid.read()
-      
       if ret:
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         annotatedFrame = frame.copy()
-        small_frame, scale_factor = resizeImage(frame, 640, 360)
-        reverse_scale_factor = 1 / scale_factor
-        face_locations = face_recognition.face_locations(small_frame, model=self.model)
+        face_locations = self.face_detection_net.infer(frame)
         self.super_res_faces = []
-        for index, (top, right, bottom, left) in enumerate(face_locations, 1):
-          self.draw_rect(
-            annotatedFrame,
-            upscaleTuple(reverse_scale_factor, (left, top)),
-            upscaleTuple(reverse_scale_factor, (right, bottom)),
-            index
-          )
-          # TODO
-          self.super_res_faces.append([cv2.imread(getPath("assets", "test.png")) for x in range(2)])
+        for index, face in enumerate(face_locations, 1):
+          cropped_face = frame[face.top:face.bottom, face.left:face.right].copy()
+          downscaled_face = downscale_to_16x16(cropped_face)
+          super_res_face = self.face_super_res_net.infer(downscaled_face)
 
-        self.current_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        self.current_frame_annotated = cv2.cvtColor(annotatedFrame, cv2.COLOR_BGR2RGB)
+          self.draw_rect(annotatedFrame, (face.left, face.top), (face.right, face.bottom), index)
+          self.super_res_faces.append([cropped_face, downscaled_face, super_res_face])
+
+        self.current_frame = frame
+        self.current_frame_annotated = annotatedFrame
         self.frame_counter += 1
 
         if (not self.abort):

@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
 import sys, os, time, cv2, multiprocessing
-from super_res_face_widget import FaceSetContainer
-from helper import clearLayout, getPath, getNextEvents, ResultImages, SndTopic, RcvTopic, QueueMsg, transformToPixmap
-from scaling_pixmap import ScalingPixmapLabel
+from modules.custom_qt import FaceSetContainer, JFlowLayout, ScalingPixmapLabel
+from modules.helper import *
+from power_usage import get_power_usage
 from video_worker import VideoProcessInterface
-from flow_layout import JFlowLayout
 from PyQt5 import QtWidgets, QtGui, QtCore, uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PyQt5.QtCore import pyqtSlot, Qt
@@ -13,12 +12,13 @@ from PyQt5.QtCore import pyqtSlot, Qt
 class MainWindow(QMainWindow):
   STATUSBAR_DISPLAY_TIME = 3500 # in ms
   EVENT_TIMER = 10 # in ms
+  POWER_USAGE_TIMER = 1000 # in ms
   MAX_CLEANUP_WAIT = 2 # in s
-  FACE_SET_NAMES = ["low_res", "super_res"]
+  FACE_SET_NAMES = ["target", "low_res", "super_res"]
 
   def __init__(self):
     super().__init__()
-    self.setWindowIcon(QtGui.QIcon(getPath("assets", "icon.png")))
+    self.setWindowIcon(QtGui.QIcon(getPath(__file__, "assets", "icon.png")))
     self.setup_ui()
     
     recv_queue = multiprocessing.Queue()
@@ -27,14 +27,20 @@ class MainWindow(QMainWindow):
     self.vid_worker.process.start()
 
     self.result_images = None
-    self.timer = QtCore.QTimer()
-    self.timer.timeout.connect(self.handle_incoming_msg)
-    self.timer.start(self.EVENT_TIMER)
+
+    self.evt_timer = QtCore.QTimer()
+    self.evt_timer.timeout.connect(self.handle_incoming_msg)
+    self.evt_timer.start(self.EVENT_TIMER)
+
+    if running_on_jetson_nano():
+      self.power_usg_timer = QtCore.QTimer()
+      self.power_usg_timer.timeout.connect(self.update_power_display)
+      self.power_usg_timer.start(self.POWER_USAGE_TIMER)
 
     # self.use_camera()
   
   def setup_ui(self):
-    uic.loadUi(getPath("assets", "main.ui"), self)
+    uic.loadUi(getPath(__file__, "assets/main.ui"), self)
     self.layout_video_input = self.findChild(QtWidgets.QVBoxLayout, 'layout_videoInput')
     self.statusbar = self.findChild(QtWidgets.QStatusBar, 'statusbar')
     super_faces_area_widget = self.findChild(QtWidgets.QWidget, 'scrollAreaWidgetContents')
@@ -90,7 +96,7 @@ class MainWindow(QMainWindow):
 
   def snapshot(self):
     try:
-      parent_path = "./snapshots/" + time.strftime("%d-%m-%Y-%H-%M-%S")
+      parent_path = os.path.join("./snapshots/" + time.strftime("%d-%m-%Y-%H-%M-%S"))
       os.makedirs(parent_path)
       cv2.imwrite(
         os.path.join(parent_path , "input_video.jpg"),
@@ -107,13 +113,13 @@ class MainWindow(QMainWindow):
         for index, face in enumerate(face_set):
           cv2.imwrite(
             os.path.join(path , self.FACE_SET_NAMES[index] + ".jpg"),
-            cv2.cvtColor(face_set[0], cv2.COLOR_RGB2BGR)
+            cv2.cvtColor(face, cv2.COLOR_RGB2BGR)
           )
 
     except OSError:
       self.show_statusbar_error("Snapshot could not be saved")
     else:
-      self.statusbar.showMessage("Snapshot saved in folder: " + path, self.STATUSBAR_DISPLAY_TIME)
+      self.statusbar.showMessage("Snapshot saved in folder: " + parent_path, self.STATUSBAR_DISPLAY_TIME)
 
   def update_images(self, result_images):
     self.result_images = result_images
@@ -147,6 +153,10 @@ class MainWindow(QMainWindow):
 
   def update_fps_display(self, fps):
     self.fps_display.setText(fps)
+
+  @pyqtSlot()
+  def update_power_display(self):
+    self.power_display.setText(get_power_usage())
 
   def reset_fps_display(self):
     self.fps_display.setText("N/A")
