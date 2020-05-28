@@ -11,5 +11,6 @@ from .main import (
   ResultImages,
   QueueMsg,
   FaceArea,
+  SuperResFaceResult,
   downscale_to_16x16,
 )

@@ -14,7 +14,7 @@ class MainWindow(QMainWindow):
   EVENT_TIMER = 10 # in ms
   POWER_USAGE_TIMER = 1000 # in ms
   MAX_CLEANUP_WAIT = 2 # in s
-  FACE_SET_NAMES = ["target", "low_res", "super_res"]
+  DISPLAY_NA = "N/A"
 
   def __init__(self):
     super().__init__()
@@ -50,6 +50,7 @@ class MainWindow(QMainWindow):
     self.action_open_file = self.findChild(QtWidgets.QAction, 'actionOpen_video_file')
     self.action_show_annotations = self.findChild(QtWidgets.QAction, 'actionShow_annotations')
     self.fps_display = self.findChild(QtWidgets.QLineEdit, 'FPSLineEdit')
+    self.psnr_display = self.findChild(QtWidgets.QLineEdit, 'PSNRLineEdit')
     self.power_display = self.findChild(QtWidgets.QLineEdit, 'PowerLineEdit')
 
     self.video_input = ScalingPixmapLabel()
@@ -66,6 +67,7 @@ class MainWindow(QMainWindow):
     self.action_open_file.triggered.connect(self.open_file)
 
     self.reset_fps_display()
+    self.reset_psnr_display()
     self.reset_power_display()
 
   @pyqtSlot()
@@ -74,8 +76,10 @@ class MainWindow(QMainWindow):
     for msg in messages:
       if (msg.topic == SndTopic.FPS):
         self.update_fps_display(msg.content)
+      elif (msg.topic == SndTopic.PSNR):
+        self.update_psnr_display(msg.content)
       elif (msg.topic == SndTopic.VIDEO_END):
-        pass
+        self.handle_video_end()
       elif (msg.topic == SndTopic.NEXT_FRAME):
         self.update_images(msg.content)
       elif (msg.topic == SndTopic.MSG):
@@ -107,14 +111,19 @@ class MainWindow(QMainWindow):
         cv2.cvtColor(self.result_images.current_frame_annotated, cv2.COLOR_RGB2BGR)
       )
 
+      psnr_file = open(os.path.join(parent_path , "psnr.csv"), "w")
+
       for index, face_set in enumerate(self.result_images.super_res_faces, 1):
+        psnr_file.write(f"Face {index},{face_set.psnr} dB\n")
         path = os.path.join(parent_path , f"face_{index}")
         os.makedirs(path)
-        for index, face in enumerate(face_set):
+        for index, face in enumerate(face_set.faces):
           cv2.imwrite(
-            os.path.join(path , self.FACE_SET_NAMES[index] + ".jpg"),
-            cv2.cvtColor(face, cv2.COLOR_RGB2BGR)
+            os.path.join(path , face[0] + ".jpg"),
+            cv2.cvtColor(face[1], cv2.COLOR_RGB2BGR)
           )
+
+      psnr_file.close()
 
     except OSError:
       self.show_statusbar_error("Snapshot could not be saved")
@@ -133,7 +142,7 @@ class MainWindow(QMainWindow):
 
     for index, face_set in enumerate(self.result_images.super_res_faces, 0):
       current_number = index + 1
-      image_set = map(transformToPixmap, self.result_images.super_res_faces[index])
+      image_set = map(lambda x: transformToPixmap(x[1]), face_set.faces)
 
       if len(self.face_sets) >= current_number:
         self.face_sets[index].replace(image_set)
@@ -154,22 +163,29 @@ class MainWindow(QMainWindow):
   def update_fps_display(self, fps):
     self.fps_display.setText(fps)
 
+  def update_psnr_display(self, psnr):
+    self.psnr_display.setText(psnr)
+
   @pyqtSlot()
   def update_power_display(self):
     self.power_display.setText(get_power_usage())
 
   def reset_fps_display(self):
-    self.fps_display.setText("N/A")
+    self.fps_display.setText(self.DISPLAY_NA)
+
+  def reset_psnr_display(self):
+    self.psnr_display.setText(self.DISPLAY_NA)
 
   def reset_power_display(self):
-    self.power_display.setText("N/A")
+    self.power_display.setText(self.DISPLAY_NA)
 
   def show_statusbar_error(self, msg):
     self.statusbar.showMessage("ERROR: " + msg, self.STATUSBAR_DISPLAY_TIME)
 
   def handle_video_end(self):
     self.statusbar.showMessage("Video feed ended", self.STATUSBAR_DISPLAY_TIME)
-    self.reset_fps_display
+    self.reset_fps_display()
+    self.reset_psnr_display()
 
   def closeEvent(self, event):
     event.accept()

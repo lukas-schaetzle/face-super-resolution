@@ -6,12 +6,13 @@ from torchvision import utils
 class FaceSuperResolutionNet():
   @torch.no_grad()
   def __init__(self):
-    self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    self.cuda = True if torch.cuda.is_available() else False
+    self.device = torch.device('cuda' if self.cuda else 'cpu')
     self.generator = Generator().to(self.device)
     self.generator.eval()
     g_checkpoint = torch.load(
-      getPath(__file__, "checkpoints/generator_checkpoint_singleGPU.ckpt"),
-      map_location=torch.device('cpu')
+      getPath(__file__, "checkpoints/unalign_trained_generator_checkpoint.ckpt"),
+      map_location=None if self.cuda else torch.device('cpu')
     )
     self.generator.load_state_dict(g_checkpoint['model_state_dict'], strict=False)
     self.step = g_checkpoint['step']

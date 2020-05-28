@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>480</height>
+    <width>800</width>
+    <height>470</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,16 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
-    <property name="margin">
+    <property name="leftMargin">
+     <number>6</number>
+    </property>
+    <property name="topMargin">
+     <number>6</number>
+    </property>
+    <property name="rightMargin">
+     <number>6</number>
+    </property>
+    <property name="bottomMargin">
      <number>6</number>
     </property>
     <item>
@@ -24,6 +33,12 @@
        <enum>Qt::Horizontal</enum>
       </property>
       <widget class="QWidget" name="widget_2" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="leftMargin">
          <number>0</number>
@@ -72,24 +87,30 @@
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
           </property>
           <layout class="QFormLayout" name="formLayout">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetDefaultConstraint</enum>
+           </property>
            <property name="formAlignment">
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
            </property>
-           <item row="1" column="0">
+           <property name="horizontalSpacing">
+            <number>10</number>
+           </property>
+           <item row="2" column="0">
             <widget class="QLabel" name="label">
              <property name="text">
               <string>FPS</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
+           <item row="4" column="0">
             <widget class="QLabel" name="label_2">
              <property name="text">
-              <string>Power usage</string>
+              <string>Power usage (mW)</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="2" column="1">
             <widget class="QLineEdit" name="FPSLineEdit">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -105,7 +126,7 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
+           <item row="4" column="1">
             <widget class="QLineEdit" name="PowerLineEdit">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -127,12 +148,47 @@
              </property>
             </widget>
            </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="PSNRLineEdit">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>N/A</string>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>Avg. PSNR (db)</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
        </layout>
       </widget>
       <widget class="QGroupBox" name="groupBox_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>3</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="title">
         <string>Super resolution faces</string>
        </property>
@@ -142,7 +198,16 @@
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <widget class="QWidget" name="scrollAreaWidgetContents"/>
+          <widget class="QWidget" name="scrollAreaWidgetContents">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>217</width>
+             <height>396</height>
+            </rect>
+           </property>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -156,7 +221,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>640</width>
+     <width>800</width>
      <height>18</height>
     </rect>
    </property>

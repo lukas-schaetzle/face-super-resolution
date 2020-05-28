@@ -35,7 +35,7 @@ class VideoWorker():
     while (not self.abort):
       if (self.vid):
         self.next_frame()
-        self.calculate_fps()
+        self.handle_fps_and_psnr()
       else:
         time.sleep(self.IDLE_SLEEP_TIME)
       self.handle_incoming_msg()
@@ -86,23 +86,47 @@ class VideoWorker():
     if (not (self.vid and self.vid.isOpened())):
       self.vid = None
       raise ValueError("Unable to open video source")
-    
+
     self.frame_counter = 0
+    self.psnr_log = [0, 0]
     self.last_timer_value = timer()
 
-  def calculate_fps(self):
+  def handle_fps_and_psnr(self):
     current_time = timer()
     time_since_last_calc = current_time - self.last_timer_value
+
     if (time_since_last_calc >= self.FPS_INTERVAL):
-      self.fps = self.frame_counter / time_since_last_calc
-      self.last_timer_value = current_time
-      self.frame_counter = 0
+      self.handle_fps(current_time, time_since_last_calc)
+      self.handle_psnr()
+
+  def handle_fps(self, current_time, time_since_last_calc):
+    self.fps = self.frame_counter / time_since_last_calc
+    self.last_timer_value = current_time
+    self.frame_counter = 0
+
+    self.send_queue.put_nowait(QueueMsg(
+      SndTopic.FPS, "{fps:.2f}".format(fps=self.fps)
+    ))
+
+  def handle_psnr(self):
+    if (self.psnr_log[1] > 0):
+      self.psnr = self.psnr_log[0] / self.psnr_log[1]
+      self.psnr_log = [0, 0]
+
+      self.send_queue.put_nowait(QueueMsg(
+        SndTopic.PSNR, "{psnr:.2f}".format(psnr=self.psnr)
+      ))
+
+  def handle_psnr(self):
+    if (self.psnr_log[1] > 0):
+      self.psnr = self.psnr_log[0] / self.psnr_log[1]
+      self.psnr_log = [0, 0]
 
       if (not self.abort):
         self.send_queue.put_nowait(QueueMsg(
-          SndTopic.FPS,
-          "{fps:.2f}".format(fps=self.fps)
+          SndTopic.PSNR, "{psnr:.2f}".format(psnr=self.psnr)
         ))
+        
 
   def next_frame(self):
     if (self.vid and self.vid.isOpened()):
@@ -113,12 +137,24 @@ class VideoWorker():
         face_locations = self.face_detection_net.infer(frame)
         self.super_res_faces = []
         for index, face in enumerate(face_locations, 1):
-          cropped_face = frame[face.top:face.bottom, face.left:face.right].copy()
+          cropped_face = cv2.resize(
+            frame[face.top:face.bottom, face.left:face.right],
+            (128, 128)
+          )
           downscaled_face = downscale_to_16x16(cropped_face)
           super_res_face = self.face_super_res_net.infer(downscaled_face)
 
+          psnr = cv2.PSNR(cropped_face, super_res_face)
+          self.psnr_log[0] += psnr
+          self.psnr_log[1] += 1
+
           self.draw_rect(annotatedFrame, (face.left, face.top), (face.right, face.bottom), index)
-          self.super_res_faces.append([cropped_face, downscaled_face, super_res_face])
+          self.super_res_faces.append(SuperResFaceResult(
+            cropped_face,
+            downscaled_face,
+            super_res_face,
+            psnr
+          ))
 
         self.current_frame = frame
         self.current_frame_annotated = annotatedFrame
@@ -132,7 +168,7 @@ class VideoWorker():
 
       else:
         self.end_video()
-    
+
   def draw_rect(self, img, origin, end, descr, color=(255, 134, 30)):
     cv2.rectangle(img, origin, end, color, 2)
 

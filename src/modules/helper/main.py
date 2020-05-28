@@ -13,13 +13,13 @@ def transformToPixmap(cv_img):
 def upscaleTuple(scale_factor, tuple_inp):
   return tuple(int(round(scale_factor * x)) for x in tuple_inp)
 
-def resizeImage(cv_img, max_width, max_height):
+def resizeImage(cv_img, max_width, max_height, interpolation=cv2.INTER_LINEAR):
   height, width = cv_img.shape[:2]
 
   h_ratio = max_height / height
   w_ratio = max_width / width
   scale_factor = min(h_ratio, w_ratio)
-  return cv2.resize(cv_img, (0,0), fx=scale_factor, fy=scale_factor), scale_factor
+  return cv2.resize(cv_img, (0,0), fx=scale_factor, fy=scale_factor, interpolation=interpolation), scale_factor
 
 def getPath(current_working_dir, *args):
   dirname = os.path.dirname(os.path.realpath(current_working_dir))
@@ -55,6 +55,7 @@ class SndTopic(Enum):
   NEXT_FRAME = 3
   MSG = 4
   MSG_ERROR = 5
+  PSNR = 6
 
 class RcvTopic(Enum):
   # Received by subprocess
@@ -100,11 +101,20 @@ class FaceArea():
     self.right = right
     self.bottom = bottom
 
+class SuperResFaceResult():
+  def __init__(self, target_face, input_face, output_face, psnr):
+    self.faces = (
+      ("target", target_face),
+      ("low_res", input_face),
+      ("super_res", output_face),
+    )
+    self.psnr = psnr
+    
 def downscale_to_16x16(img):
   _64x64_down_sampling = transforms.Resize((64, 64))
   _32x32_down_sampling = transforms.Resize((32, 32))
-  _16x16_down_sampling = transforms.Resize((16,16))
+  _16x16_down_sampling = transforms.Resize((16, 16))
 
-  pil_img = Image.fromarray(numpy.array(img))
+  pil_img = Image.fromarray(img)
   downsized_pil_img = _16x16_down_sampling(_32x32_down_sampling(_64x64_down_sampling(pil_img)))
   return numpy.array(downsized_pil_img)

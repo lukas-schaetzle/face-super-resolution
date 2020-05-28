@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 class FaceSetContainer(QtWidgets.QWidget):
   def __init__(self, title, pixmaps, *args, **kwargs):
     super().__init__(*args, **kwargs)
-    self.size = QtCore.QSize(200, 200)
+    self.size = QtCore.QSize(128, 128)
 
     self.label = QtWidgets.QLabel()
     self.label.setText(title)
