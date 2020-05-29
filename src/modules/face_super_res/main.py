@@ -28,6 +28,5 @@ class FaceSuperResolutionNet():
     transformed_image = self.to_tensor(input_img).unsqueeze(0).to(self.device)
     tensor_output = self.generator(transformed_image, self.step, self.alpha)
     tensor_img = torch.squeeze(0.5 * tensor_output + 0.5)
-    # TODO: Fix transformation
-    # transforms.ToPILImage("RGB")(tensor_img).save(".test", "JPEG")
+    # TODO: Fix transformation to PIL image (green pixels)
     return numpy.array(transforms.ToPILImage()(tensor_img))

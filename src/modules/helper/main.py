@@ -26,8 +26,6 @@ def getPath(current_working_dir, *args):
   return os.path.join(dirname, *args)
 
 def clearLayout(layout):
-  # Copied from https://stackoverflow.com/questions/4528347/clear-all-widgets-in-a-layout-in-pyqt/13103617
-
   while layout.count():
     child = layout.takeAt(0)
     if child.widget():
@@ -78,28 +76,34 @@ class QueueMsg():
     self.topic = topic
     self.content = content
 
-# class FaceArea():
-#   def __init__(self, face, max_dimensions):
-#     max_width = max_dimensions[0]
-#     max_height = max_dimensions[1]
-    
-#     side_len = max(face.Width, face.Height)
-#     side_half_len = round(side_len / 2)
-
-#     self.left = max(0, face.Center[0] - side_half_len)
-#     self.top = max(0, face.Center[1] - side_half_len)
-#     self.right = min(max_width - 1, face.Center[2] + side_half_len)
-#     self.bottom = min(max_height + 1, face.Center[2] + side_half_len)
-  
-#   def is_square(self):
-#     return (self.right - self.left == self.bottom - self.top)
-
 class FaceArea():
-  def __init__(self, left, top, right, bottom):
-    self.left = left
-    self.top = top
-    self.right = right
-    self.bottom = bottom
+  def __init__(self, corners=None, center_w_h=None, max_dim=None):
+    width = height = 0
+
+    if corners is not None:
+      left, top, right, bottom = corners
+      width = right - left
+      height = bottom - top
+      self.center = (width / 2 + left, height / 2 + top)
+    else:
+      self.center, width, height = center_w_h
+
+    side_len = max(width, height)
+    side_half_len = side_len / 2
+
+    self.left = int(round(   max(0, self.center[0] - side_half_len) ))
+    self.top = int(round(    max(0, self.center[1] - side_half_len) ))
+
+    if max_dim:
+      max_width, max_height = max_dim
+      self.right = int(round(  min(max_width, self.center[0] + side_half_len) ))
+      self.bottom = int(round( min(max_height, self.center[1] + side_half_len) ))
+    else:
+      self.right = int(round(  self.center[0] + side_half_len ))
+      self.bottom = int(round( self.center[1] + side_half_len ))
+    
+  def is_square(self):
+    return (self.right - self.left == self.bottom - self.top)
 
 class SuperResFaceResult():
   def __init__(self, target_face, input_face, output_face, psnr):

@@ -169,7 +169,7 @@ class VideoWorker():
       else:
         self.end_video()
 
-  def draw_rect(self, img, origin, end, descr, color=(255, 134, 30)):
+  def draw_rect(self, img, origin, end, descr, color=(220, 20, 60)):
     cv2.rectangle(img, origin, end, color, 2)
 
     descr = str(descr)
