@@ -32,7 +32,6 @@ class FaceSetContainer(QtWidgets.QWidget):
     wrapper_layout.setAlignment(Qt.AlignTop)
     self.setLayout(wrapper_layout)
 
-
   def replace(self, pixmaps, title=None):
     if title:
       self.label.setText(title)
@@ -43,4 +42,3 @@ class FaceSetContainer(QtWidgets.QWidget):
         Qt.KeepAspectRatio,
         Qt.SmoothTransformation
       ))
-    

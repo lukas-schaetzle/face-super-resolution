@@ -19,4 +19,3 @@ else:
     with jtop() as jetson:
       power_consumption_mw = jetson.stats["WATT"]
       return power_consumption_mw[component][type]
-

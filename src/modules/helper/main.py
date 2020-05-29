@@ -113,7 +113,7 @@ class SuperResFaceResult():
       ("super_res", output_face),
     )
     self.psnr = psnr
-    
+
 def downscale_to_16x16(img):
   _64x64_down_sampling = transforms.Resize((64, 64))
   _32x32_down_sampling = transforms.Resize((32, 32))

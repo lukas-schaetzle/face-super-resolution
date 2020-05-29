@@ -7,7 +7,7 @@ class ScalingPixmapLabel(QtWidgets.QLabel):
     super().__init__(*args, **kwargs)
     self.setMinimumSize(1, 1)
     self.setAlignment(Qt.AlignCenter)
-    
+
     if full_pixmap:
       self.setFullPixmap(full_pixmap)
     else:
@@ -32,7 +32,7 @@ class ScalingPixmapLabel(QtWidgets.QLabel):
       Qt.KeepAspectRatio,
       Qt.SmoothTransformation
     ))
-  
+
   def sizeHint(self):
     if self.original_pixmap:
       return self.original_pixmap.size()

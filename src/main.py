@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
     super().__init__()
     self.setWindowIcon(QtGui.QIcon(getPath(__file__, "assets", "icon.png")))
     self.setup_ui()
-    
+
     recv_queue = multiprocessing.Queue()
     send_queue = multiprocessing.Queue()
     self.vid_worker = VideoProcessInterface(send_queue, recv_queue)
@@ -37,8 +37,6 @@ class MainWindow(QMainWindow):
       self.power_usg_timer.timeout.connect(self.update_power_display)
       self.power_usg_timer.start(self.POWER_USAGE_TIMER)
 
-    # self.use_camera()
-  
   def setup_ui(self):
     uic.loadUi(getPath(__file__, "assets/main.ui"), self)
     self.layout_video_input = self.findChild(QtWidgets.QVBoxLayout, 'layout_videoInput')

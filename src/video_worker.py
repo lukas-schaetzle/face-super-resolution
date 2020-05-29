@@ -28,7 +28,7 @@ class VideoWorker():
     self.vid = None
     self.face_detection_net = FaceDetectionNet()
     self.face_super_res_net = FaceSuperResolutionNet()
-    
+
   def work(self):
     print("Worker initialized")
 
@@ -126,7 +126,6 @@ class VideoWorker():
         self.send_queue.put_nowait(QueueMsg(
           SndTopic.PSNR, "{psnr:.2f}".format(psnr=self.psnr)
         ))
-        
 
   def next_frame(self):
     if (self.vid and self.vid.isOpened()):
