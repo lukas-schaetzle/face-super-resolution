@@ -27,7 +27,7 @@ class VideoWorker():
     self.abort = False
     self.vid = None
     self.face_detection_net = FaceDetectionNet()
-    self.face_super_res_net = FaceSuperResolutionNet()
+    # self.face_super_res_net = FaceSuperResolutionNet()
 
   def work(self):
     print("Worker initialized")
