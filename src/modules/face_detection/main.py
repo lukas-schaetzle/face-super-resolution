@@ -8,7 +8,7 @@ class FaceDetectionNet():
   def infer(self, input_img):
     max_height, max_width = input_img.shape[:2]
 
-    input_img_rgba = cv2.cvtColor(frame, cv2.COLOR_RGB2RGBA)
+    input_img_rgba = cv2.cvtColor(input_img, cv2.COLOR_RGB2RGBA)
     small_frame, scale_factor = resizeImage(input_img_rgba, 640, 360)
     reverse_scale_factor = 1 / scale_factor
 
