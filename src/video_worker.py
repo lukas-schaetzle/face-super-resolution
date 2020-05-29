@@ -143,20 +143,20 @@ class VideoWorker():
         frame[face.top:face.bottom, face.left:face.right],
         (128, 128)
       )
-      downscaled_face = downscale_to_16x16(cropped_face)
-      super_res_face = self.face_super_res_net.infer(downscaled_face)
+      # downscaled_face = downscale_to_16x16(cropped_face)
+      # super_res_face = self.face_super_res_net.infer(downscaled_face)
 
-      psnr = cv2.PSNR(cropped_face, super_res_face)
-      self.psnr_log[0] += psnr
-      self.psnr_log[1] += 1
+      # psnr = cv2.PSNR(cropped_face, super_res_face)
+      # self.psnr_log[0] += psnr
+      # self.psnr_log[1] += 1
 
-      self.draw_rect(annotatedFrame, (face.left, face.top), (face.right, face.bottom), index)
-      self.super_res_faces.append(SuperResFaceResult(
-        cropped_face,
-        downscaled_face,
-        super_res_face,
-        psnr
-      ))
+      # self.draw_rect(annotatedFrame, (face.left, face.top), (face.right, face.bottom), index)
+      # self.super_res_faces.append(SuperResFaceResult(
+      #   cropped_face,
+      #   downscaled_face,
+      #   super_res_face,
+      #   psnr
+      # ))
 
     self.current_frame = frame
     self.current_frame_annotated = annotatedFrame
