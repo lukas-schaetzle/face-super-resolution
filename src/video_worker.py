@@ -1,4 +1,4 @@
-import threading, time, cv2, multiprocessing, numpy
+import threading, time, cv2, multiprocessing, numpy, jetson.utils
 from modules.helper import *
 from modules.face_detection import FaceDetectionNet
 from modules.face_super_res import FaceSuperResolutionNet
@@ -57,7 +57,7 @@ class VideoWorker():
   def use_camera(self):
     access_success = True
     self.cam = jetson.utils.gstCamera(640, 360, "0")
-    
+
     # try:
     #   print("Trying to use standard camera")
     #   self.new_video(0)
