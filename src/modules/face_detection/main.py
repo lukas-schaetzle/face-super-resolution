@@ -1,4 +1,4 @@
-import jetson.inference, jetson.utils
+import jetson.inference, jetson.utils, cv2
 from ..helper import FaceArea, upscaleTuple, resizeImage
 
 class FaceDetectionNet():
