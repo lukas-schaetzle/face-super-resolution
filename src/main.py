@@ -6,7 +6,7 @@ from modules.helper import *
 from power_usage import get_power_usage
 from video_worker import VideoProcessInterface
 from PyQt5 import QtWidgets, QtGui, QtCore, uic
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QDialog
 from PyQt5.QtCore import pyqtSlot, Qt
 
 class MainWindow(QMainWindow):
@@ -47,6 +47,7 @@ class MainWindow(QMainWindow):
     self.action_use_camera = self.findChild(QtWidgets.QAction, 'actionGet_camera_feed')
     self.action_open_file = self.findChild(QtWidgets.QAction, 'actionOpen_video_file')
     self.action_show_annotations = self.findChild(QtWidgets.QAction, 'actionShow_annotations')
+    self.action_about = self.findChild(QtWidgets.QAction, 'actionAbout')
     self.fps_display = self.findChild(QtWidgets.QLineEdit, 'FPSLineEdit')
     self.psnr_display = self.findChild(QtWidgets.QLineEdit, 'PSNRLineEdit')
     self.power_display = self.findChild(QtWidgets.QLineEdit, 'PowerLineEdit')
@@ -63,6 +64,7 @@ class MainWindow(QMainWindow):
     self.action_snapshot.triggered.connect(self.snapshot)
     self.action_use_camera.triggered.connect(self.use_camera)
     self.action_open_file.triggered.connect(self.open_file)
+    self.action_about.triggered.connect(self.showAboutDialog)
 
     self.reset_fps_display()
     self.reset_psnr_display()
@@ -191,6 +193,15 @@ class MainWindow(QMainWindow):
     self.vid_worker.process.join()
     if (self.vid_worker.process.is_alive()):
       self.vid_worker.process.terminate()
+
+  def showAboutDialog(self):
+    AboutDialog().exec_()
+
+class AboutDialog(QDialog):
+  def __init__(self):
+    super().__init__()
+    self.setWindowIcon(QtGui.QIcon(getPath(__file__, "assets", "icon.png")))
+    uic.loadUi(getPath(__file__, "assets/about.ui"), self)
 
 if __name__ == "__main__":
   app = QApplication(sys.argv)
