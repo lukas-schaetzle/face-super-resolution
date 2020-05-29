@@ -12,7 +12,7 @@ class FaceSuperResolutionNet():
     self.generator.eval()
     g_checkpoint = torch.load(
       getPath(__file__, "checkpoints/unalign_trained_generator_checkpoint.ckpt"),
-      map_location=None if self.cuda else torch.device('cpu')
+      map_location='cuda:0' if self.cuda else torch.device('cpu')
     )
     self.generator.load_state_dict(g_checkpoint['model_state_dict'], strict=False)
     self.step = g_checkpoint['step']

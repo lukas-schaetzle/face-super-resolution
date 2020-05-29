@@ -19,7 +19,7 @@ class VideoProcessInterface():
 class VideoWorker():
   FPS_INTERVAL = 1.5 # in seconds
   IDLE_SLEEP_TIME = 0.1 # in seconds
-  GSTREAMER_PIPELINE = 'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=1280, height=720, format=(string)NV12, framerate=21/1 ! nvvidconv flip-method=0 ! video/x-raw, width=1280, height=720, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
+  GSTREAMER_PIPELINE = 'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=1280, height=720, format=(string)NV12, framerate=60/1 ! nvvidconv flip-method=2 ! video/x-raw, width=1280, height=720, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
 
   def __init__(self, send_queue, recv_queue):
     self.send_queue = send_queue
@@ -56,23 +56,21 @@ class VideoWorker():
 
   def use_camera(self):
     access_success = True
-    self.cam = jetson.utils.gstCamera(640, 360, "0")
+    try:
+       print("Trying to use standard camera")
+       self.new_video(0)
+    except ValueError:
+       try:
+         print("Trying to use gStreamer camera")
+         self.new_video(self.GSTREAMER_PIPELINE, cv2.CAP_GSTREAMER)
+       except ValueError:
+         access_success = False
 
-    # try:
-    #   print("Trying to use standard camera")
-    #   self.new_video(0)
-    # except ValueError:
-    #   try:
-    #     print("Trying to use gStreamer camera")
-    #     self.new_video(self.GSTREAMER_PIPELINE, cv2.CAP_GSTREAMER)
-    #   except ValueError:
-    #     access_success = False
-
-    # if (self.vid.read() and access_success):
-    #   self.send_queue.put_nowait(QueueMsg(SndTopic.MSG, "Using camera feed"))
-    # else:
-    #   self.send_queue.put_nowait(QueueMsg(SndTopic.MSG_ERROR, "Could not use camera"))
-    #   self.vid = None
+    if (access_success):
+       self.send_queue.put_nowait(QueueMsg(SndTopic.MSG, "Using camera feed"))
+    else:
+       self.send_queue.put_nowait(QueueMsg(SndTopic.MSG_ERROR, "Could not use camera"))
+       self.vid = None
 
   def open_file(self, filename):
     print(filename)
@@ -82,9 +80,12 @@ class VideoWorker():
     except ValueError:
       self.send_queue.put_nowait(QueueMsg(SndTopic.MSG_ERROR, "Could not open file " + filename))
       
-  def new_video(self, video_source):
-    self.vid = cv2.VideoCapture(video_source)
-    if (not (self.vid and self.vid.isOpened())):
+  def new_video(self, video_source, video_type=None):
+    if (video_type==None):
+      self.vid = jetson.utils.gstCamera(1280, 720, "0")
+    else:
+      self.vid = jetson.utils.gstCamera(1280, 720, "0")
+    if (not (self.vid)):
       self.vid = None
       raise ValueError("Unable to open video source")
 
@@ -129,7 +130,7 @@ class VideoWorker():
         ))
 
   def next_frame(self):
-    imgRaw, width, height = self.cam.CaptureRGBA(zeroCopy=1)
+    imgRaw, width, height = self.vid.CaptureRGBA(zeroCopy=1)
     face_locations = self.face_detection_net.infer(imgRaw)
 
     img = jetson.utils.cudaToNumpy(imgRaw, width, height, 4)
