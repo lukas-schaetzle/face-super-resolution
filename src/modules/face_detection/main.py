@@ -6,7 +6,7 @@ class FaceDetectionNet():
     self.net = jetson.inference.detectNet("facenet", threshold=0.5)
 
   def infer(self, input_img):
-    face_locations = self.net.Detect(input_img, 640, 360, "True")
+    face_locations = self.net.Detect(input_img, 640, 360)
 
     faces = []
     for face in face_locations:

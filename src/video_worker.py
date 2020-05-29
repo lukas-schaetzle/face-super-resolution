@@ -56,7 +56,7 @@ class VideoWorker():
 
   def use_camera(self):
     access_success = True
-    self.cam = jetson.utils.gstCamera(640, 360, "0")
+    self.cam = jetson.utils.gstCamera(640, 360, "/dev/video0")
 
     # try:
     #   print("Trying to use standard camera")
