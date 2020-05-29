@@ -15,7 +15,7 @@ except ModuleNotFoundError:
   def get_power_usage(*args, **kwargs):
     return "N/A"
 else:
-  def get_power_usage(component=Component.ALL, type=ValueTypes.CURRENT):
+  def get_power_usage(component=Component.ALL.value, type=ValueTypes.CURRENT.value):
     with jtop() as jetson:
       power_consumption_mw = jetson.stats["WATT"]
       return power_consumption_mw[component][type]
