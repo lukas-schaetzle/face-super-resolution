@@ -13,7 +13,7 @@ class FaceDetectionNet():
     reverse_scale_factor = 1 / scale_factor
 
     cuda_img = jetson.utils.cudaFromNumpy(small_frame)
-    face_locations = self.net.Detect(small_frame, 640, 360)
+    face_locations = self.net.Detect(cuda_img, 640, 360)
 
     faces = []
     for face in face_locations:
