@@ -11,7 +11,10 @@
 1. Install dependencies (`pipenv install`)
 2. Run the program (`pipenv run python src/main.py`)
 
-### Dependencies on Jetson
+## Running on Jetson
+
+If you're running th program on Jetson, the current **power usage** can also be displayed in the program. But you have to install another package in advance:
+`pipenv run pip install jetson-stats`
 
 As the Jetson is using an ARM architecture, some dependencies may not be easily installable trough pip. The following links may help if you run into problems during dependency installation:
 
