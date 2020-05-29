@@ -1,4 +1,4 @@
-import jetson.inference, jetson.utils, cv2
+import jetson.inference, jetson.utils, cv2, numpy
 from ..helper import FaceArea, upscaleTuple, resizeImage
 
 class FaceDetectionNet():
@@ -12,7 +12,7 @@ class FaceDetectionNet():
     small_frame, scale_factor = resizeImage(input_img_rgba, 640, 360)
     reverse_scale_factor = 1 / scale_factor
 
-    cuda_img = jetson.utils.cudaFromNumpy(small_frame)
+    cuda_img = jetson.utils.cudaFromNumpy(small_frame).astype(numpy.float32)
     face_locations = self.net.Detect(cuda_img, 640, 360)
 
     faces = []
