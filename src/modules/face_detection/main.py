@@ -3,7 +3,7 @@ from ..helper import FaceArea, upscaleTuple, resizeImage
 
 class FaceDetectionNet():
   def __init__(self):
-    self.net = jetson.inference.detectNet("facenet", threshold=self._confidence)
+    self.net = jetson.inference.detectNet("facenet", threshold=0.5)
 
   def infer(self, input_img):
     max_height, max_width = input_img.shape[:2]
