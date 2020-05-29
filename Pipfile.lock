@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "da9f98deb16a31d1ccc5b9df1bf9d448fbbf6f3e6c0d691ee356a1c57d30b703"
+            "sha256": "5ce151657319a91636aa6ff07311e9879e2b9cc7ecf3613ad05615112df714f9"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -14,33 +14,6 @@
         ]
     },
     "default": {
-        "click": {
-            "hashes": [
-                "sha256:d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a",
-                "sha256:dacca89f4bfadd5de3d7489b7c8a566eee0d3676333fbb50030263894c38c0dc"
-            ],
-            "version": "==7.1.2"
-        },
-        "dlib": {
-            "hashes": [
-                "sha256:d0eeaca07bc4c75973ad0f739a541d8fa4003af778f0dc1c2c595d470823819a"
-            ],
-            "version": "==19.19.0"
-        },
-        "face-recognition": {
-            "hashes": [
-                "sha256:5e5efdd1686aa566af0d3cc1313b131e4b197657a8ffd03669e6d3fad92705ec",
-                "sha256:c543e91c8cfbf24d19db04e511ebbddcb23894bcee510133729ee78e9f4b5e83"
-            ],
-            "index": "pypi",
-            "version": "==1.3.0"
-        },
-        "face-recognition-models": {
-            "hashes": [
-                "sha256:b79bd200a88c87c9a9d446c990ae71c5a626d1f3730174e6d570157ff1d896cf"
-            ],
-            "version": "==0.3.0"
-        },
         "future": {
             "hashes": [
                 "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"

@@ -8,7 +8,6 @@ verify_ssl = true
 [packages]
 opencv-python = "*"
 pyqt5 = "*"
-face-recognition = "*"
 torch = "*"
 torchvision = "*"
 numpy = "*"
