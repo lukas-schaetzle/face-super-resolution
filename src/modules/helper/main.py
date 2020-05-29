@@ -1,4 +1,4 @@
-import os, platform, cv2, numpy, # torchvision.transforms as transforms
+import os, platform, cv2, numpy, torchvision.transforms as transforms
 from enum import Enum
 from queue import Empty as EmptyError
 from PyQt5 import QtGui
