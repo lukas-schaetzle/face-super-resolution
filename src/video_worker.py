@@ -140,7 +140,7 @@ class VideoWorker():
             frame[face.top:face.bottom, face.left:face.right],
             (128, 128)
           )
-          downscaled_face = downscale_to_16x16(cropped_face)
+          # downscaled_face = downscale_to_16x16(cropped_face)
           # super_res_face = self.face_super_res_net.infer(downscaled_face)
 
           # psnr = cv2.PSNR(cropped_face, super_res_face)
