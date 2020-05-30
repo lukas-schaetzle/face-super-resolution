@@ -3,7 +3,7 @@
 import sys, os, time, cv2, multiprocessing
 from modules.custom_qt import FaceSetContainer, JFlowLayout, ScalingPixmapLabel
 from modules.helper import *
-from power_usage import get_power_usage
+from power_usage import get_power_usage, close_power_monitor
 from video_worker import VideoProcessInterface
 from PyQt5 import QtWidgets, QtGui, QtCore, uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QDialog
@@ -190,6 +190,7 @@ class MainWindow(QMainWindow):
 
   def closeEvent(self, event):
     event.accept()
+    close_power_monitor()
     self.vid_worker.send_queue.put_nowait(QueueMsg(RcvTopic.KILL))
     self.vid_worker.process.join()
     if (self.vid_worker.process.is_alive()):
