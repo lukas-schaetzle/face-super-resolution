@@ -26,7 +26,6 @@ class VideoWorker():
     self.recv_queue = recv_queue
     self.abort = False
     self.vid = None
-    self.cam = None
     self.face_detection_net = FaceDetectionNet()
     self.face_super_res_net = FaceSuperResolutionNet()
     debug_log("Networks initialized")
@@ -35,7 +34,7 @@ class VideoWorker():
     debug_log("Worker initialized")
 
     while (not self.abort):
-      if (self.cam):
+      if (self.vid):
         self.next_frame()
         self.handle_fps_and_psnr()
       else:
@@ -131,46 +130,40 @@ class VideoWorker():
         ))
 
   def next_frame(self):
-    imgRaw, width, height = self.cam.CaptureRGBA(zeroCopy=1)
-    print("============= Get BBs")
-    face_locations = self.face_detection_net.infer(imgRaw)
-    print("============= Before cudatonumpy")
-    img = jetson.utils.cudaToNumpy(imgRaw, width, height, 4)
-    print("============ CV conversion start")
-    img = cv2.cvtColor(img, cv2.COLOR_RGBA2RGB).astype(numpy.uint8)
-    self.current_frame = img
-    annotatedFrame = self.current_frame.copy()
-    print("BBs and current frame ok")
-    self.super_res_faces = []
-    for index, face in enumerate(face_locations, 1):
-      cropped_face = cv2.resize(
-        self.current_frame[face.top:face.bottom, face.left:face.right],
-        (128, 128)
-      )
-      downscaled_face = downscale_to_16x16(cropped_face)
-      super_res_face = self.face_super_res_net.infer(downscaled_face)
+    if (self.vid and self.vid.isOpened()):
+      ret, frame = self.vid.read()
+      if ret:
+        self.current_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        self.current_frame_annotated = self.current_frame.copy()
+        face_locations = self.face_detection_net.infer(self.current_frame)
+    
+        self.super_res_faces = []
+        for index, face in enumerate(face_locations, 1):
+          cropped_face = cv2.resize(
+            self.current_frame[face.top:face.bottom, face.left:face.right],
+            (128, 128)
+          )
+          downscaled_face = downscale_to_16x16(cropped_face)
+          super_res_face = self.face_super_res_net.infer(downscaled_face)
 
-      psnr = cv2.PSNR(cropped_face, super_res_face)
-      self.psnr_log[0] += psnr
-      self.psnr_log[1] += 1
+          psnr = cv2.PSNR(cropped_face, super_res_face)
+          self.psnr_log[0] += psnr
+          self.psnr_log[1] += 1
 
-      self.draw_rect(annotatedFrame, (face.left, face.top), (face.right, face.bottom), index)
-      self.super_res_faces.append(SuperResFaceResult(
-        cropped_face,
-        downscaled_face,
-        super_res_face,
-        psnr
-      ))
+          self.draw_rect(self.current_frame_annotated, (face.left, face.top), (face.right, face.bottom), index)
+          self.super_res_faces.append(SuperResFaceResult(
+            cropped_face,
+            downscaled_face,
+            super_res_face,
+            psnr
+          ))
 
-    self.current_frame_annotated = annotatedFrame
-    self.frame_counter += 1
-
-    if (not self.abort):
-      debug_log("Send frames")
-      self.send_queue.put_nowait(QueueMsg(
-        SndTopic.NEXT_FRAME,
-        ResultImages(self.current_frame, self.current_frame_annotated, self.super_res_faces)
-      ))
+        self.frame_counter += 1
+        debug_log("Send frames")
+        self.send_queue.put_nowait(QueueMsg(
+          SndTopic.NEXT_FRAME,
+          ResultImages(self.current_frame, self.current_frame_annotated, self.super_res_faces)
+        ))
 
   def draw_rect(self, img, origin, end, descr, color=(220, 20, 60)):
     cv2.rectangle(img, origin, end, color, 2)
