@@ -3,8 +3,8 @@
 import sys, os, time, cv2, multiprocessing
 from modules.custom_qt import FaceSetContainer, JFlowLayout, ScalingPixmapLabel
 from modules.helper import *
-from power_usage import get_power_usage, close_power_monitor
-from video_worker import VideoProcessInterface
+from modules.jetson_monitor import JetsonMonitor
+from modules.video_worker import VideoProcessInterface
 from PyQt5 import QtWidgets, QtGui, QtCore, uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QDialog
 from PyQt5.QtCore import pyqtSlot, Qt
@@ -32,9 +32,10 @@ class MainWindow(QMainWindow):
     self.evt_timer.timeout.connect(self.handle_incoming_msg)
     self.evt_timer.start(self.EVENT_TIMER)
 
-    if running_on_jetson_nano():
+    self.jetsonMonitor = JetsonMonitor()
+    if self.jetsonMonitor.jetson:
       self.power_usg_timer = QtCore.QTimer()
-      self.power_usg_timer.timeout.connect(self.update_power_display)
+      self.power_usg_timer.timeout.connect(self.update_power_temp_display)
       self.power_usg_timer.start(self.POWER_USAGE_TIMER)
 
   def setup_ui(self):
@@ -51,6 +52,7 @@ class MainWindow(QMainWindow):
     self.fps_display = self.findChild(QtWidgets.QLineEdit, 'FPSLineEdit')
     self.psnr_display = self.findChild(QtWidgets.QLineEdit, 'PSNRLineEdit')
     self.power_display = self.findChild(QtWidgets.QLineEdit, 'PowerLineEdit')
+    self.temp_display = self.findChild(QtWidgets.QLineEdit, 'TempLineEdit')
 
     self.video_input = ScalingPixmapLabel()
     self.layout_video_input.addWidget(self.video_input)
@@ -95,7 +97,7 @@ class MainWindow(QMainWindow):
 
   def open_file(self):
     file_name, _ = QFileDialog.getOpenFileName(self, "Open video", "", "All Files (*);;Movie Files (*.mp4 *.avi)")
-    # TODO: Add supported file formats
+    # TODO: Add all supported file formats
     if (file_name):
       self.vid_worker.send_queue.put_nowait(QueueMsg(RcvTopic.OPEN_FILE, file_name))
 
@@ -168,8 +170,9 @@ class MainWindow(QMainWindow):
     self.psnr_display.setText(psnr)
 
   @pyqtSlot()
-  def update_power_display(self):
-    self.power_display.setText(get_power_usage())
+  def update_power_temp_display(self):
+    self.power_display.setText(self.jetsonMonitor.get_power_usage())
+    self.temp_display.setText(self.jetsonMonitor.get_temp())
 
   def reset_fps_display(self):
     self.fps_display.setText(self.DISPLAY_NA)
@@ -190,7 +193,7 @@ class MainWindow(QMainWindow):
 
   def closeEvent(self, event):
     event.accept()
-    close_power_monitor()
+    self.jetsonMonitor.close()
     self.vid_worker.send_queue.put_nowait(QueueMsg(RcvTopic.KILL))
     self.vid_worker.process.join()
     if (self.vid_worker.process.is_alive()):
