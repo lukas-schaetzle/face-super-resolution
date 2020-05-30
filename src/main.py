@@ -81,6 +81,7 @@ class MainWindow(QMainWindow):
       elif (msg.topic == SndTopic.VIDEO_END):
         self.handle_video_end()
       elif (msg.topic == SndTopic.NEXT_FRAME):
+        print("=========== Frame Received")
         self.update_images(msg.content)
       elif (msg.topic == SndTopic.MSG):
         self.statusbar.showMessage(msg.content, self.STATUSBAR_DISPLAY_TIME)

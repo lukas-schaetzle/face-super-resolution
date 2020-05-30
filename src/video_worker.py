@@ -26,14 +26,18 @@ class VideoWorker():
     self.recv_queue = recv_queue
     self.abort = False
     self.vid = None
+    self.cam = None
+    print("============= Net init before")
     self.face_detection_net = FaceDetectionNet()
+    print("============= Net init before 2")
     self.face_super_res_net = FaceSuperResolutionNet()
+    print("============= Net init success")
 
   def work(self):
     print("Worker initialized")
 
     while (not self.abort):
-      if (self.vid):
+      if (self.cam):
         self.next_frame()
         self.handle_fps_and_psnr()
       else:
@@ -46,6 +50,7 @@ class VideoWorker():
       if (msg.topic == RcvTopic.KILL):
         self.abort = True
       elif (msg.topic == RcvTopic.USE_CAMERA):
+        print("=========== Use camera")
         self.use_camera()
       elif (msg.topic == RcvTopic.OPEN_FILE):
         self.open_file(msg.content)
@@ -57,7 +62,10 @@ class VideoWorker():
   def use_camera(self):
     access_success = True
     self.cam = jetson.utils.gstCamera(640, 360, "/dev/video0")
-
+    
+    self.frame_counter = 0
+    self.psnr_log = [0, 0]
+    self.last_timer_value = timer()
     # try:
     #   print("Trying to use standard camera")
     #   self.new_video(0)
@@ -130,39 +138,41 @@ class VideoWorker():
 
   def next_frame(self):
     imgRaw, width, height = self.cam.CaptureRGBA(zeroCopy=1)
+    print("============= Get BBs")
     face_locations = self.face_detection_net.infer(imgRaw)
-
+    print("============= Before cudatonumpy")
     img = jetson.utils.cudaToNumpy(imgRaw, width, height, 4)
+    print("============ CV conversion start")
     img = cv2.cvtColor(img, cv2.COLOR_RGBA2RGB).astype(numpy.uint8)
-    self.current_frame = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    self.current_frame = img
     annotatedFrame = self.current_frame.copy()
-
+    print("============== BBs and current frame ok")
     self.super_res_faces = []
     for index, face in enumerate(face_locations, 1):
       cropped_face = cv2.resize(
-        frame[face.top:face.bottom, face.left:face.right],
+        self.current_frame[face.top:face.bottom, face.left:face.right],
         (128, 128)
       )
-      # downscaled_face = downscale_to_16x16(cropped_face)
-      # super_res_face = self.face_super_res_net.infer(downscaled_face)
+      downscaled_face = downscale_to_16x16(cropped_face)
+      super_res_face = self.face_super_res_net.infer(downscaled_face)
 
-      # psnr = cv2.PSNR(cropped_face, super_res_face)
-      # self.psnr_log[0] += psnr
-      # self.psnr_log[1] += 1
+      psnr = cv2.PSNR(cropped_face, super_res_face)
+      self.psnr_log[0] += psnr
+      self.psnr_log[1] += 1
 
-      # self.draw_rect(annotatedFrame, (face.left, face.top), (face.right, face.bottom), index)
-      # self.super_res_faces.append(SuperResFaceResult(
-      #   cropped_face,
-      #   downscaled_face,
-      #   super_res_face,
-      #   psnr
-      # ))
+      self.draw_rect(annotatedFrame, (face.left, face.top), (face.right, face.bottom), index)
+      self.super_res_faces.append(SuperResFaceResult(
+        cropped_face,
+        downscaled_face,
+        super_res_face,
+        psnr
+      ))
 
-    self.current_frame = frame
     self.current_frame_annotated = annotatedFrame
     self.frame_counter += 1
 
     if (not self.abort):
+      print("=========== send frames")
       self.send_queue.put_nowait(QueueMsg(
         SndTopic.NEXT_FRAME,
         ResultImages(self.current_frame, self.current_frame_annotated, self.super_res_faces)
