@@ -6,6 +6,7 @@ from torchvision import utils
 class FaceSuperResolutionNet():
   @torch.no_grad()
   def __init__(self):
+    debug_log("Init face super resolution net")
     self.cuda = True if torch.cuda.is_available() else False
     self.device = torch.device('cuda' if self.cuda else 'cpu')
     self.generator = Generator().to(self.device)

@@ -27,14 +27,12 @@ class VideoWorker():
     self.abort = False
     self.vid = None
     self.cam = None
-    print("============= Net init before")
     self.face_detection_net = FaceDetectionNet()
-    print("============= Net init before 2")
     self.face_super_res_net = FaceSuperResolutionNet()
-    print("============= Net init success")
+    debug_log("Networks initialized")
 
   def work(self):
-    print("Worker initialized")
+    debug_log("Worker initialized")
 
     while (not self.abort):
       if (self.cam):
@@ -47,43 +45,39 @@ class VideoWorker():
   def handle_incoming_msg(self):
     messages = getNextEvents(self.recv_queue)
     for msg in messages:
+      debug_log(f"Worker recveived {msg.topic}")
       if (msg.topic == RcvTopic.KILL):
         self.abort = True
       elif (msg.topic == RcvTopic.USE_CAMERA):
-        print("=========== Use camera")
         self.use_camera()
       elif (msg.topic == RcvTopic.OPEN_FILE):
         self.open_file(msg.content)
       elif (msg.topic == RcvTopic.END_VID):
         self.end_video()
       else:
-        print("No endpoint for event topic {topic}".format(topic=msg.topic))
+        debug_log("No endpoint for event topic {topic}".format(topic=msg.topic))
 
   def use_camera(self):
     access_success = True
-    self.cam = jetson.utils.gstCamera(640, 360, "/dev/video0")
-    
-    self.frame_counter = 0
-    self.psnr_log = [0, 0]
-    self.last_timer_value = timer()
-    # try:
-    #   print("Trying to use standard camera")
-    #   self.new_video(0)
-    # except ValueError:
-    #   try:
-    #     print("Trying to use gStreamer camera")
-    #     self.new_video(self.GSTREAMER_PIPELINE, cv2.CAP_GSTREAMER)
-    #   except ValueError:
-    #     access_success = False
 
-    # if (self.vid.read() and access_success):
-    #   self.send_queue.put_nowait(QueueMsg(SndTopic.MSG, "Using camera feed"))
-    # else:
-    #   self.send_queue.put_nowait(QueueMsg(SndTopic.MSG_ERROR, "Could not use camera"))
-    #   self.vid = None
+    try:
+      debug_log("Trying to use standard camera")
+      self.new_video(0)
+    except ValueError:
+      try:
+        debug_log("Trying to use gStreamer camera")
+        self.new_video(self.GSTREAMER_PIPELINE, cv2.CAP_GSTREAMER)
+      except ValueError:
+        access_success = False
+
+    if (self.vid.read() and access_success):
+      self.send_queue.put_nowait(QueueMsg(SndTopic.MSG, "Using camera feed"))
+    else:
+      self.send_queue.put_nowait(QueueMsg(SndTopic.MSG_ERROR, "Could not use camera"))
+      self.vid = None
 
   def open_file(self, filename):
-    print(filename)
+    debug_log(f"Open file {filename}")
     try:
       self.new_video(filename)
       self.send_queue.put_nowait(QueueMsg(SndTopic.MSG, "Using file " + filename))
@@ -146,7 +140,7 @@ class VideoWorker():
     img = cv2.cvtColor(img, cv2.COLOR_RGBA2RGB).astype(numpy.uint8)
     self.current_frame = img
     annotatedFrame = self.current_frame.copy()
-    print("============== BBs and current frame ok")
+    print("BBs and current frame ok")
     self.super_res_faces = []
     for index, face in enumerate(face_locations, 1):
       cropped_face = cv2.resize(
@@ -172,7 +166,7 @@ class VideoWorker():
     self.frame_counter += 1
 
     if (not self.abort):
-      print("=========== send frames")
+      debug_log("Send frames")
       self.send_queue.put_nowait(QueueMsg(
         SndTopic.NEXT_FRAME,
         ResultImages(self.current_frame, self.current_frame_annotated, self.super_res_faces)

@@ -13,4 +13,5 @@ from .main import (
   FaceArea,
   SuperResFaceResult,
   downscale_to_16x16,
+  debug_log,
 )

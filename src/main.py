@@ -74,6 +74,7 @@ class MainWindow(QMainWindow):
   def handle_incoming_msg(self):
     messages = getNextEvents(self.vid_worker.recv_queue)
     for msg in messages:
+      debug_log(f"UI thread recveived {msg.topic}")
       if (msg.topic == SndTopic.FPS):
         self.update_fps_display(msg.content)
       elif (msg.topic == SndTopic.PSNR):
@@ -81,14 +82,13 @@ class MainWindow(QMainWindow):
       elif (msg.topic == SndTopic.VIDEO_END):
         self.handle_video_end()
       elif (msg.topic == SndTopic.NEXT_FRAME):
-        print("=========== Frame Received")
         self.update_images(msg.content)
       elif (msg.topic == SndTopic.MSG):
         self.statusbar.showMessage(msg.content, self.STATUSBAR_DISPLAY_TIME)
       elif (msg.topic == SndTopic.MSG_ERROR):
         self.show_statusbar_error(msg.content)
       else:
-        print("No endpoint for event topic {topic}".format(topic=msg.topic))
+        debug_log("No endpoint for event topic {topic}".format(topic=msg.topic))
 
   def use_camera(self):
     self.vid_worker.send_queue.put_nowait(QueueMsg(RcvTopic.USE_CAMERA))

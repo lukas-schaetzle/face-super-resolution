@@ -122,3 +122,6 @@ def downscale_to_16x16(img):
   pil_img = Image.fromarray(img)
   downsized_pil_img = _16x16_down_sampling(_32x32_down_sampling(_64x64_down_sampling(pil_img)))
   return numpy.array(downsized_pil_img)
+
+def debug_log(msg):
+  print(f"DEBUG: {str(msg)}")

@@ -1,8 +1,9 @@
 import jetson.inference, jetson.utils, cv2, numpy
-from ..helper import FaceArea, upscaleTuple, resizeImage
+from ..helper import FaceArea, upscaleTuple, resizeImage, debug_log
 
 class FaceDetectionNet():
   def __init__(self):
+    debug_log("Init face detection net")
     self.net = jetson.inference.detectNet("facenet", threshold=0.5)
 
   def infer(self, input_img):
