@@ -62,4 +62,4 @@ After successfully installing the dependencies, run `pipenv run python3 src/main
 
 * MIPI camera might not work correctly. If you run into problems with it, use a USB camera as a workaround.
 * The face recognition neural network is different for the normal pc version.
-* Some green (sometimes even red pixels) may appear on the right faces in the super resolution panel. These pixels appear when using the function `torchvision.transforms.ToPILImage` on the output of the super resolution net and seem to appear more often when the light is very bright in the frame.
+* Some bluish green (sometimes even red pixels) may appear on the right faces in the super resolution panel. These pixels appear when using the function `torchvision.transforms.ToPILImage` on the output of the super resolution net and seem to appear more often when the light is very bright in the frame.
