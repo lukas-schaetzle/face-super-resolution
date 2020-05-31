@@ -1,6 +1,6 @@
 import numpy, torch, torchvision.transforms as transforms
 from .model import Generator
-from ..helper import getPath
+from ..helper import getPath, debug_log
 from torchvision import utils
 
 class FaceSuperResolutionNet():

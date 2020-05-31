@@ -12,7 +12,7 @@ from PyQt5.QtCore import pyqtSlot, Qt
 class MainWindow(QMainWindow):
   STATUSBAR_DISPLAY_TIME = 3500 # in ms
   EVENT_TIMER = 10 # in ms
-  POWER_USAGE_TIMER = 1000 # in ms
+  JETSON_MONITOR_TIMER = 1000 # in ms
   MAX_CLEANUP_WAIT = 2 # in s
   DISPLAY_NA = "N/A"
 
@@ -34,9 +34,9 @@ class MainWindow(QMainWindow):
 
     self.jetsonMonitor = JetsonMonitor()
     if self.jetsonMonitor.jetson:
-      self.power_usg_timer = QtCore.QTimer()
-      self.power_usg_timer.timeout.connect(self.update_power_temp_display)
-      self.power_usg_timer.start(self.POWER_USAGE_TIMER)
+      self.jetson_monitor_timer = QtCore.QTimer()
+      self.jetson_monitor_timer.timeout.connect(self.update_power_temp_display)
+      self.jetson_monitor_timer.start(self.JETSON_MONITOR_TIMER)
 
   def setup_ui(self):
     uic.loadUi(getPath(__file__, "assets/main.ui"), self)

@@ -1,4 +1,5 @@
 import os, platform, cv2, numpy, torchvision.transforms as transforms
+from ..arg_parser import arg_cam, arg_debug
 from enum import Enum
 from queue import Empty as EmptyError
 from PyQt5 import QtGui
@@ -124,4 +125,5 @@ def downscale_to_16x16(img):
   return numpy.array(downsized_pil_img)
 
 def debug_log(msg):
-  print(f"DEBUG: {str(msg)}")
+  if arg_debug:
+    print(f"DEBUG: {str(msg)}")

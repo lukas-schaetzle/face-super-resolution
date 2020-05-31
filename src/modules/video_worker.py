@@ -1,7 +1,8 @@
-import threading, time, cv2, multiprocessing, numpy, jetson.utils
-from modules.helper import *
-from modules.face_detection import FaceDetectionNet
-from modules.face_super_res import FaceSuperResolutionNet
+import threading, time, cv2, multiprocessing, numpy
+from .arg_parser import arg_cam
+from .helper import *
+from .face_detection import FaceDetectionNet
+from .face_super_res import FaceSuperResolutionNet
 from timeit import default_timer as timer
 
 def use_worker(send_queue, recv_queue):
@@ -29,6 +30,9 @@ class VideoWorker():
     self.face_detection_net = FaceDetectionNet()
     self.face_super_res_net = FaceSuperResolutionNet()
     debug_log("Networks initialized")
+
+    if arg_cam:
+      self.use_camera()
 
   def work(self):
     debug_log("Worker initialized")
