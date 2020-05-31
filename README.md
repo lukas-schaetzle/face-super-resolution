@@ -4,18 +4,31 @@
 
 > This work was done by Lukas Schätzle, Jacqueline Wegert, Benno Latermann during the IWI276 Autonome Systeme Labor at the Karlsruhe University of Applied Sciences (Hochschule Karlruhe - Technik und Wirtschaft) in SS 2020. 
 
+
+## Table of Contents
+
+* [Requirements](#requirements)
+* [Preparations for Jetson Nano](#preparations-for-jetson-nano)
+* [Running the programl](#running-the-program)
+* [Running on a normal PC](#running-on-a-normal-PC-experimental)
+* [Acknowledgments](#acknowledgments)
+* [Contact](#contact)
+
+## Requirements
+
+* Python 3.6 or above
+* Jetson Nano (additional experimental version exists for normal PC)
+
 ## Preparations for Jetson Nano:
 
-Minimal Python version is 3.6
-
-**Note:** If you want to run the program on a normal desktop PC, follow the instruction in section [Running on a desktop PC](#running-on-a-normal-PC-experimental) instead.
+**Note:** If you want to run the program on a normal desktop PC, follow the instruction in section [Running on a normal PC](#running-on-a-normal-PC-experimental) instead.
 
 Go to https://github.com/dusty-nv/jetson-inference/blob/master/docs/building-repo-2.md and install the necessary dependencies. The following sections are relevant:
 * Cloning the Repo
 * Python Development Packages
 * Configuring with CMake
 * Downloading Models (make sure that model "FaceNet" is selected, included by default)
-* Installing PyTorch (make sure to select PyTorch 1.4.0 for Python 3.6, this is not the default!)
+* Installing PyTorch (make sure to select PyTorch 1.4.0 for Python 3.6, this is *not* selected by default!)
 
 ![Screenshot PyTorch installer](https://github.com/Tummerhore/face-super-resolution/blob/master/readme_images/ScreenshotPytorchInstallation.png?raw=true)
 
@@ -63,3 +76,16 @@ After successfully installing the dependencies, run `pipenv run python3 src/main
 * MIPI camera might not work correctly. If you run into problems with it, use a USB camera as a workaround.
 * The face recognition neural network is different for the normal pc version.
 * Some bluish green (sometimes even red pixels) may appear on the right faces in the super resolution panel. These pixels appear when using the function `torchvision.transforms.ToPILImage` on the output of the super resolution net and seem to appear more often when the light is very bright in the frame.
+* Sometimes opened jpg images are not correctly displayed
+
+## Acknowledgments
+
+This repo is based on
+  - [Source 1](https://github.com/)
+  - [Source 2](https://github.com/)
+  - [Source 2](https://github.com/)
+
+Thanks to the original authors for their work!
+
+## Contact
+Please email `mickael.cormier AT iosb.fraunhofer.de` for further questions.
