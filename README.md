@@ -6,7 +6,7 @@ Minimal Python version is 3.6
 
 ## Preparations for Jetson Nano:
 
-*Note*: If you want to run the program on a normal desktop PC, follow the instruction in section [Running on a desktop PC](#pc) instead.
+*Note*: If you want to run the program on a normal desktop PC, follow the instruction in section [Running on a desktop PC](#running-on-a-normal-PC-experimental) instead.
 
 Go to https://github.com/dusty-nv/jetson-inference/blob/master/docs/building-repo-2.md and install the necessary dependencies. The following sections are relevant:
 * Cloning the Repo
@@ -41,11 +41,11 @@ At the bottom left, you can see several performance values.
 
 At any time, you can take a snapshot to save the current input and output images along with the according PSNR values per face. Use the spacebar or the menu (`File -> Save snapshot`). The status bar will tell you where the snapshot has been saved to.
 
-## Running on a desktop PC (experimental)
+## Running on a normal PC (experimental)
 
 To install the dependencies on a normal pc we have created a pipenv file. Please note that the temperature and power usage display will not work here. Also, the program will use a different neural network for face detection, as the standard one (which is faster) needs a package specifically designed for the jetson.
 
-To install dependencies just run `pipenv install` in the project's root directory. On windows, pipenv may not be abale to install all dependencies, you likely have to build dlib by yourself (see https://stackoverflow.com/a/49538054/10264920).
+To install dependencies just run `pipenv install` in the project's root directory. On Windows, pipenv may not be able to install all dependencies, you likely have to build dlib by yourself (see https://stackoverflow.com/a/49538054/10264920).
 
 We also had some trouble installing pytorch through pipenv. I suggest using pip directly to install it with the mentioned install command on pytorch's website. E.g. `pipenv run pip install torch===1.5.0 torchvision===0.6.0 -f https://download.pytorch.org/whl/torch_stable.html`
 
