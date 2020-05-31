@@ -65,7 +65,7 @@ class VideoWorker():
 
     try:
       debug_log("Trying to use standard camera")
-      self.new_video(0)
+      self.new_video(0, (640, 360))
     except ValueError:
       try:
         debug_log("Trying to use gStreamer camera")
@@ -87,11 +87,15 @@ class VideoWorker():
     except ValueError:
       self.send_queue.put_nowait(QueueMsg(SndTopic.MSG_ERROR, "Could not open file " + filename))
       
-  def new_video(self, video_source):
+  def new_video(self, video_source, dimensions=None):
     self.vid = cv2.VideoCapture(video_source)
     if (not (self.vid and self.vid.isOpened())):
       self.vid = None
       raise ValueError("Unable to open video source")
+
+    if (dimensions):
+      self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, dimensions[0])
+      self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, dimensions[1])
 
     self.frame_counter = 0
     self.psnr_log = [0, 0]

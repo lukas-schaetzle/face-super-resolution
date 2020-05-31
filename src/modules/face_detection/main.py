@@ -15,10 +15,9 @@ class FaceDetectionNet():
     small_frame, scale_factor = resizeImage(input_img_rgba, self.SMALL_DIM[0], self.SMALL_DIM[1])
     reverse_scale_factor = 1 / scale_factor
 
-    debug_log("Begin cuda conversion")
-    cuda_img = jetson.utils.cudaFromNumpy(small_frame.astype(numpy.float32))
-    debug_log("End cuda conversion")
-    face_locations = self.net.Detect(cuda_img, self.SMALL_DIM[0], self.SMALL_DIM[1], "False")
+    height, width = small_frame.shape[:2]
+    cuda_img = jetson.utils.cudaFromNumpy(small_frame)
+    face_locations = self.net.Detect(cuda_img, width, height, "False")
 
     faces = []
     for face in face_locations:
