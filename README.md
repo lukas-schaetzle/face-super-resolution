@@ -41,7 +41,7 @@ At the bottom left, you can see several performance values.
 
 At any time, you can take a snapshot to save the current input and output images along with the according PSNR values per face. Use the spacebar or the menu (`File -> Save snapshot`). The status bar will tell you where the snapshot has been saved to.
 
-## Running on a desktop PC (experimental)
+## Running on a normal PC (experimental)
 
 To install the dependencies on a normal pc we have created a pipenv file. Please note that the temperature and power usage display will not work here. Also, the program will use a different neural network for face detection, as the standard one (which is faster) needs a package specifically designed for the jetson.
 
