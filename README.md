@@ -12,8 +12,11 @@ Go to https://github.com/dusty-nv/jetson-inference/blob/master/docs/building-rep
 * Cloning the Repo
 * Python Development Packages
 * Configuring with CMake
-* Downloading Models (download "facenet-120")
-* Installing PyTorch (make sure to select PyTorch 1.4.0 for Python 3.6)
+* Downloading Models (make sure that model "FaceNet" is selected, included by default)
+* Installing PyTorch (make sure to select PyTorch 1.4.0 for Python 3.6, this is not the default!)
+
+![alt text](https://github.com/Tummerhore/face-super-resolution/blob/new_jetson_test/ScreenshotPytorchInstallation.png?raw=true)
+
 * Compiling the Project
 
 To display the current power usage and temperature you also have to install the package "jetsons-stats": `sudo -H pip3 install -U jetson-stats`
