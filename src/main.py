@@ -96,7 +96,7 @@ class MainWindow(QMainWindow):
     self.vid_worker.send_queue.put_nowait(QueueMsg(RcvTopic.USE_CAMERA))
 
   def open_file(self):
-    file_name, _ = QFileDialog.getOpenFileName(self, "Open video", "", "All Files (*);;Movie Files (*.mp4 *.avi)")
+    file_name, _ = QFileDialog.getOpenFileName(self, "Open video", "", "All Files (*);;Movie Files (*.mp4 *.avi);;Image Files (*.jpg)")
     # TODO: Add all supported file formats
     if (file_name):
       self.vid_worker.send_queue.put_nowait(QueueMsg(RcvTopic.OPEN_FILE, file_name))

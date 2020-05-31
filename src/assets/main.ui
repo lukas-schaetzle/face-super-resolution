@@ -306,7 +306,7 @@
   </action>
   <action name="actionOpen_video_file">
    <property name="text">
-    <string>Open video file...</string>
+    <string>Open file...</string>
    </property>
   </action>
   <action name="actionClose">

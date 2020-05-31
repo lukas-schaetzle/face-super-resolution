@@ -15,7 +15,7 @@ Go to https://github.com/dusty-nv/jetson-inference/blob/master/docs/building-rep
 * Downloading Models (make sure that model "FaceNet" is selected, included by default)
 * Installing PyTorch (make sure to select PyTorch 1.4.0 for Python 3.6, this is not the default!)
 
-![Screenshot PyTorch installer](https://github.com/Tummerhore/face-super-resolution/blob/master/ScreenshotPytorchInstallation.png?raw=true)
+![Screenshot PyTorch installer](https://github.com/Tummerhore/face-super-resolution/blob/master/readme_images/ScreenshotPytorchInstallation.png?raw=true)
 
 * Compiling the Project
 
@@ -23,7 +23,7 @@ To display the current power usage and temperature you also have to install the 
 
 ## Running the program
 
-If you want to use a camera, connect it in advance. (The program has been successfully tested with a USB camera. It may also work with a MIPI camera, but we cannot guarantee it.) If you have no camera, you can also use video files.
+If you want to use a camera, connect it in advance. (The program has been successfully tested with a USB camera. It may also work with a MIPI camera, but we cannot guarantee it.) If you have no camera, you can also use video and image files.
 
 From the project's root directory run: `python3 src/main.py`
 
@@ -44,6 +44,10 @@ At the bottom left, you can see several performance values.
 
 At any time, you can take a snapshot to save the current input and output images along with the according PSNR values per face. Use the spacebar or the menu (`File -> Save snapshot`). The status bar will tell you where the snapshot has been saved to.
 
+![Screenshot Program](https://github.com/Tummerhore/face-super-resolution/blob/master/readme_images/ScreenshotProgram.png?raw=true)
+
+*Note:* The Ubuntu distro which is installed on the Jetson Nano uses a global menu bar by default (like MacOS). You can access it from the panel at ther very top of your screen.
+
 ## Running on a normal PC (experimental)
 
 To install the dependencies on a normal pc we have created a pipenv file. Please note that the temperature and power usage display will not work here. Also, the program will use a different neural network for face detection, as the standard one (which is faster) needs a package specifically designed for the jetson.
@@ -58,3 +62,4 @@ After successfully installing the dependencies, run `pipenv run python3 src/main
 
 * MIPI camera might not work correctly. If you run into problems with it, use a USB camera as a workaround.
 * The face recognition neural network is different for the normal pc version.
+* Some green (sometimes even red pixels) may appear on the right faces in the super resolution panel. These pixels appear when using the function `torchvision.transforms.ToPILImage` on the output of the super resolution net and seem to appear more often when the light is very bright in the frame.
