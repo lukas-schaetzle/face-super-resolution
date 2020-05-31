@@ -1,10 +1,12 @@
-# Hochschule Karlsruhe: Autonome Systeme Labor SS20 - Face Super-Resolution (Jetson Nano)
+# IW276 Autonome Systeme Labor - Face Super-Resolution on Jetson Nano
 
-This program has been made for the lab "Autonome Systeme" at Hochschule Karlsruhe - Technik und Wirtschaft during the summer semester 2020.
+![Screenshot Program](https://github.com/Tummerhore/face-super-resolution/blob/master/readme_images/ScreenshotProgram.png?raw=true)
 
-Minimal Python version is 3.6
+> This work was done by Lukas Schätzle, Jacqueline Wegert, Benno Latermann during the IWI276 Autonome Systeme Labor at the Karlsruhe University of Applied Sciences (Hochschule Karlruhe - Technik und Wirtschaft) in SS 2020. 
 
 ## Preparations for Jetson Nano:
+
+Minimal Python version is 3.6
 
 **Note:** If you want to run the program on a normal desktop PC, follow the instruction in section [Running on a desktop PC](#running-on-a-normal-PC-experimental) instead.
 
@@ -43,8 +45,6 @@ The left panel shows the input video with annotated faces. (You can also the ann
 At the bottom left, you can see several performance values.
 
 At any time, you can take a snapshot to save the current input and output images along with the according PSNR values per face. Use the spacebar or the menu (`File -> Save snapshot`). The status bar will tell you where the snapshot has been saved to.
-
-![Screenshot Program](https://github.com/Tummerhore/face-super-resolution/blob/master/readme_images/ScreenshotProgram.png?raw=true)
 
 **Note:** The Ubuntu distro which is installed on the Jetson Nano uses a global menu bar by default (like MacOS). You can access it from the panel at the very top of your screen.
 
