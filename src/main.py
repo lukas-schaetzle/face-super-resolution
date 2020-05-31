@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys, os, time, cv2, multiprocessing
-from modules.custom_qt import FaceSetContainer, JFlowLayout, ScalingPixmapLabel
+from modules.custom_qt import FaceSetContainer, ScalingPixmapLabel
 from modules.helper import *
 from modules.jetson_monitor import JetsonMonitor
 from modules.video_worker import VideoProcessInterface

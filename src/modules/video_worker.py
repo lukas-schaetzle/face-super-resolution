@@ -39,6 +39,9 @@ class VideoWorker():
       self.use_camera()
 
   def work(self):
+    self.send_queue.put_nowait(QueueMsg(
+      SndTopic.MSG, "Worker initialized"
+    ))
     debug_log("Worker initialized")
 
     while (not self.abort):
