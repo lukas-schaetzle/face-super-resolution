@@ -6,7 +6,7 @@ Minimal Python version is 3.6
 
 ## Preparations for Jetson Nano:
 
-*Note*: If you want to run the program on a normal desktop PC, follow the instruction in section [Running on a desktop PC](#pc) instead.
+*Note*: If you want to run the program on a normal desktop PC, follow the instruction in section [Running on a desktop PC](#running-on-a-normal-PC-experimental) instead.
 
 Go to https://github.com/dusty-nv/jetson-inference/blob/master/docs/building-repo-2.md and install the necessary dependencies. The following sections are relevant:
 * Cloning the Repo
