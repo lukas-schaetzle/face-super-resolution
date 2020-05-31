@@ -1,9 +1,13 @@
 import threading, time, cv2, multiprocessing, numpy
 from .arg_parser import arg_cam
-from .helper import *
-from .face_detection import FaceDetectionNet
-from .face_super_res import FaceSuperResolutionNet
 from timeit import default_timer as timer
+from .helper import *
+from .face_super_res import FaceSuperResolutionNet
+
+if running_on_jetson_nano():
+  from .face_detection import FaceDetectionNet
+else:
+  from .face_detection_alternative import FaceDetectionNet
 
 def use_worker(send_queue, recv_queue):
   send_queue.cancel_join_thread()
