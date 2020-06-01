@@ -77,7 +77,7 @@ To install dependencies just run `pipenv install` in the project's root director
 
 We also had some trouble installing pytorch through pipenv. I suggest using pip directly to install it with the mentioned install command on pytorch's website. E.g.
 ```
-pipenv run pip install torch===1.5.0 torchvision===0.6.0 -f https://download.pytorch.org/whl/torch_stable.html`
+pipenv run pip install torch===1.5.0 torchvision===0.6.0 -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 After successfully installing the dependencies, run `pipenv run python3 src/main.py`
