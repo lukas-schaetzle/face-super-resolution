@@ -22,7 +22,7 @@ This program takes a camera feed or video/image file as input and tries to detec
 * Python 3.6 (or above)
 * Jetson Nano (additional experimental version for normal PC exists, too)
 * Jetpack 4.3
-* PyTorch 1.4.0 und Torchvision 0.5.0 (or above)
+* PyTorch 1.4.0 and Torchvision 0.5.0 (or above)
 * opencv-python 4.2.0.34 (or above)
 * Pillow 7.1.2 (or above)
 * numpy 1.18.4 (or above)
