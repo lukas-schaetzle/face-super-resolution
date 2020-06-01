@@ -75,7 +75,10 @@ To install the dependencies on a normal pc we have created a pipenv file. Please
 
 To install dependencies just run `pipenv install` in the project's root directory. On Windows, pipenv may not be able to install all dependencies, you likely have to build dlib by yourself (see https://stackoverflow.com/a/49538054/10264920).
 
-We also had some trouble installing pytorch through pipenv. I suggest using pip directly to install it with the mentioned install command on pytorch's website. E.g. `pipenv run pip install torch===1.5.0 torchvision===0.6.0 -f https://download.pytorch.org/whl/torch_stable.html`
+We also had some trouble installing pytorch through pipenv. I suggest using pip directly to install it with the mentioned install command on pytorch's website. E.g.
+```
+pipenv run pip install torch===1.5.0 torchvision===0.6.0 -f https://download.pytorch.org/whl/torch_stable.html`
+```
 
 After successfully installing the dependencies, run `pipenv run python3 src/main.py`
 
