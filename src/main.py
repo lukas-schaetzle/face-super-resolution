@@ -189,7 +189,6 @@ class MainWindow(QMainWindow):
   def handle_video_end(self):
     self.statusbar.showMessage("Video feed ended", self.STATUSBAR_DISPLAY_TIME)
     self.reset_fps_display()
-    self.reset_psnr_display()
 
   def closeEvent(self, event):
     event.accept()

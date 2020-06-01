@@ -175,6 +175,9 @@ class VideoWorker():
           SndTopic.NEXT_FRAME,
           ResultImages(self.current_frame, self.current_frame_annotated, self.super_res_faces)
         ))
+      else:
+        self.handle_psnr()
+        self.end_video()
 
   def draw_rect(self, img, origin, end, descr, color=(220, 20, 60)):
     cv2.rectangle(img, origin, end, color, 2)
@@ -186,5 +189,6 @@ class VideoWorker():
     cv2.putText(img, descr, (origin[0], origin[1] + text_height - int(baseline/2)), cv2.FONT_ITALIC, 1, (255, 255, 255), 2)
 
   def end_video(self):
-    self.vid = None
-    self.send_queue.put_nowait(QueueMsg(SndTopic.VIDEO_END))
+    if self.vid
+      self.vid = None
+      self.send_queue.put_nowait(QueueMsg(SndTopic.VIDEO_END))
