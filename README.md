@@ -16,8 +16,9 @@
 
 ## Requirements
 
-* Python 3.6 or above
+* Python 3.6 (or above)
 * Jetson Nano (additional experimental version for normal PC exists, too)
+* Jetpack 4.3
 
 ## Preparations for Jetson Nano:
 
