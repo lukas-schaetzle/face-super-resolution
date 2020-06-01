@@ -11,7 +11,7 @@ This program takes a camera feed or video/image file as input and tries to detec
 
 * [Requirements](#requirements)
 * [Preparations for Jetson Nano](#preparations-for-jetson-nano)
-* [Running the programl](#running-the-program)
+* [Running the program](#running-the-program)
 * [Running on a normal PC](#running-on-a-normal-PC-experimental)
 * [Known issues](#known-issues)
 * [Acknowledgments](#acknowledgments)
