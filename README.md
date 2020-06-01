@@ -39,7 +39,7 @@ Go to https://github.com/dusty-nv/jetson-inference/blob/master/docs/building-rep
 * Python Development Packages
 * Configuring with CMake
 * Downloading Models (make sure that model "FaceNet" is selected, which is selected by default)
-* Installing PyTorch (make sure to select PyTorch 1.4.0 for Python 3.6, this is *not* selected by default!)
+* Installing PyTorch (make sure to select PyTorch 1.4.0 for Python 3.6, this is **not** selected by default!)
 
 ![Screenshot PyTorch installer](https://github.com/Tummerhore/face-super-resolution/blob/master/readme_images/ScreenshotPytorchInstallation.png?raw=true)
 
