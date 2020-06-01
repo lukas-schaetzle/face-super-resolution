@@ -81,9 +81,10 @@ After successfully installing the dependencies, run `pipenv run python3 src/main
 ## Acknowledgments
 
 This repo is based on
-  - [Source 1](https://github.com/)
-  - [Source 2](https://github.com/)
-  - [Source 2](https://github.com/)
+  - [Progressive Face Super Resolution](https://github.com/DeokyunKim/Progressive-Face-Super-Resolution)
+  - [Jetson Hello AI World (Face detection with FaceNet)](https://github.com/dusty-nv/jetson-inference)
+  - [Face recognition with dlib](https://github.com/ageitgey/face_recognition)
+  - [Jetson Stats](https://github.com/rbonghi/jetson_stats)
 
 Thanks to the original authors for their work!
 
