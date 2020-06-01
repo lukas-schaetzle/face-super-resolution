@@ -71,7 +71,7 @@ At any time, you can take a snapshot to save the current input and output images
 
 ## Running on a normal PC (experimental)
 
-To install the dependencies on a normal pc we have created a pipenv file. Please note that the temperature and power usage display will not work here. Also, the program will use a different neural network for face detection, as the standard one (which is faster) needs a package specifically designed for the jetson.
+To install the dependencies on a normal pc we have created a pipenv file. First, install pipenv: `pip install --user pipenv`
 
 To install dependencies just run `pipenv install` in the project's root directory. On Windows, pipenv may not be able to install all dependencies, you likely have to build dlib by yourself (see https://stackoverflow.com/a/49538054/10264920).
 
@@ -81,6 +81,8 @@ pipenv run pip install torch===1.5.0 torchvision===0.6.0 -f https://download.pyt
 ```
 
 After successfully installing the dependencies, run `pipenv run python3 src/main.py`
+
+Please note that the temperature and power usage display is not available in this version. Also, the program will use a different neural network for face detection, as the standard one (which is faster) needs a package specifically designed for the jetson.
 
 ## Known issues
 
