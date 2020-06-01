@@ -19,6 +19,13 @@
 * Python 3.6 (or above)
 * Jetson Nano (additional experimental version for normal PC exists, too)
 * Jetpack 4.3
+* PyTorch 1.4.0 und Torchvision 0.5.0 (or above)
+* opencv-python 4.2.0.34 (or above)
+* Pillow 7.1.2 (or above)
+* numpy 1.18.4 (or above)
+* face-recognition 1.3.0 (or above)
+* PyQt5 5.14.2 (or above)
+* jetson-stats 2.1.0 (or above)
 
 ## Preparations for Jetson Nano:
 
@@ -28,7 +35,7 @@ Go to https://github.com/dusty-nv/jetson-inference/blob/master/docs/building-rep
 * Cloning the Repo
 * Python Development Packages
 * Configuring with CMake
-* Downloading Models (make sure that model "FaceNet" is selected, included by default)
+* Downloading Models (make sure that model "FaceNet" is selected, which is selected by default)
 * Installing PyTorch (make sure to select PyTorch 1.4.0 for Python 3.6, this is *not* selected by default!)
 
 ![Screenshot PyTorch installer](https://github.com/Tummerhore/face-super-resolution/blob/master/readme_images/ScreenshotPytorchInstallation.png?raw=true)
