@@ -1,4 +1,5 @@
 from enum import Enum
+
 try:
   from jtop import jtop
 except ModuleNotFoundError:

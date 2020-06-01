@@ -1,5 +1,5 @@
 import os, platform, cv2, numpy, torchvision.transforms as transforms
-from ..arg_parser import arg_cam, arg_debug
+from .arg_parser import arg_cam, arg_debug
 from enum import Enum
 from queue import Empty as EmptyError
 from PyQt5 import QtGui
