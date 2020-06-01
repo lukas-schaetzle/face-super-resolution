@@ -92,6 +92,7 @@ Please note that the temperature and power usage display is not available in thi
 * MIPI camera might not work correctly. If you run into problems with it, use a USB camera as a workaround.
 * The face recognition neural network is different for the normal pc version.
 * Some bluish green (sometimes even red pixels) may appear on the right faces in the super resolution panel. These pixels appear when using the function `torchvision.transforms.ToPILImage` on the output of the super resolution net and seem to appear more often when the light is very bright in the frame.
+* If the bounding box of a detected face is at the very edge of the input image, the cropped face may get slightly scaled in only one direction. This is because the PSNR computation needs the compared images to have the same size and the super resolution net always outputs a 128x128 px image. If the bounding box cannot easily be enlarged around its center because it's already at the image edge, the is scaled to 128x128 px instead.
 * Sometimes opened jpg images are not correctly displayed
 
 ## Acknowledgments
