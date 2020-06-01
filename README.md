@@ -1,5 +1,7 @@
 # IW276 Autonome Systeme Labor - Face Super-Resolution on Jetson Nano
 
+This program takes a camera feed or video/image file as input and tries to detect faces in every frame. The extracted faces (left images in right panel) are downscaled (bilinear scaling) to a 16x16 px face (middle images, upscaled in the UI) which is then used as input for the face super resolution. Ideally, its output (right images) is close to the original face.
+
 ![Screenshot Program](https://github.com/Tummerhore/face-super-resolution/blob/master/readme_images/ScreenshotProgram.png?raw=true)
 
 > This work was done by Lukas Schätzle, Jacqueline Wegert, Benno Latermann during the IWI276 Autonome Systeme Labor at the Karlsruhe University of Applied Sciences (Hochschule Karlruhe - Technik und Wirtschaft) in SS 2020. 
@@ -102,4 +104,5 @@ This repo is based on
 Thanks to the original authors for their work!
 
 ## Contact
+
 Please email `mickael.cormier AT iosb.fraunhofer.de` for further questions.
