@@ -47,6 +47,8 @@ Go to https://github.com/dusty-nv/jetson-inference/blob/master/docs/building-rep
 
 To display the current power usage and temperature you also have to install the package "jetsons-stats": `sudo -H pip3 install -U jetson-stats`
 
+PyQt5 should already be installed on the Jetson. If not, run the following command: `sudo pip3 install -U PyQt5`
+
 ## Running the program
 
 If you want to use a camera, connect it in advance. (The program has been successfully tested with a USB camera. It may also work with a MIPI camera, but we cannot guarantee it.) If you have no camera, you can also use video and image files.
