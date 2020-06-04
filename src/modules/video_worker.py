@@ -150,24 +150,24 @@ class VideoWorker():
     
         self.super_res_faces = []
         for index, face in enumerate(face_locations, 1):
-          cropped_face = cv2.resize(
-            self.current_frame[face.top:face.bottom, face.left:face.right],
-            (128, 128)
-          )
-          downscaled_face = downscale_to_16x16(cropped_face)
-          super_res_face = self.face_super_res_net.infer(downscaled_face)
+          # cropped_face = cv2.resize(
+          #   self.current_frame[face.top:face.bottom, face.left:face.right],
+          #   (128, 128)
+          # )
+          # downscaled_face = downscale_to_16x16(cropped_face)
+          # super_res_face = self.face_super_res_net.infer(downscaled_face)
 
-          psnr = cv2.PSNR(cropped_face, super_res_face)
-          self.psnr_log[0] += psnr
-          self.psnr_log[1] += 1
+          # psnr = cv2.PSNR(cropped_face, super_res_face)
+          # self.psnr_log[0] += psnr
+          # self.psnr_log[1] += 1
 
           self.draw_rect(self.current_frame_annotated, (face.left, face.top), (face.right, face.bottom), index)
-          self.super_res_faces.append(SuperResFaceResult(
-            cropped_face,
-            downscaled_face,
-            super_res_face,
-            psnr
-          ))
+          # self.super_res_faces.append(SuperResFaceResult(
+          #   cropped_face,
+          #   downscaled_face,
+          #   super_res_face,
+          #   psnr
+          # ))
 
         self.frame_counter += 1
         debug_log("Send frames")
@@ -189,6 +189,6 @@ class VideoWorker():
     cv2.putText(img, descr, (origin[0], origin[1] + text_height - int(baseline/2)), cv2.FONT_ITALIC, 1, (255, 255, 255), 2)
 
   def end_video(self):
-    if self.vid
+    if self.vid:
       self.vid = None
       self.send_queue.put_nowait(QueueMsg(SndTopic.VIDEO_END))
