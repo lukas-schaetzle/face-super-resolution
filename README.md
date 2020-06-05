@@ -4,7 +4,7 @@ This program takes a camera feed or video/image file as input and tries to detec
 
 ![Screenshot Program](https://github.com/Tummerhore/face-super-resolution/blob/master/readme_images/ScreenshotProgram.png?raw=true)
 
-> This work was done by Lukas Schätzle, Jacqueline Wegert, Benno Latermann during the IWI276 Autonome Systeme Labor at the Karlsruhe University of Applied Sciences (Hochschule Karlruhe - Technik und Wirtschaft) in SS 2020. 
+> This work was done by Lukas Schätzle, Jacqueline Wegert, Benno Latermann during the IW276 Autonome Systeme Labor at the Karlsruhe University of Applied Sciences (Hochschule Karlruhe - Technik und Wirtschaft) in SS 2020. 
 
 
 ## Table of Contents
