@@ -1,0 +1,13 @@
+-i https://pypi.org/simple
+click==7.1.2
+dlib==19.19.0
+face-recognition-models==0.3.0
+face-recognition==1.3.0
+future==0.18.2
+numpy==1.18.4
+opencv-python==4.2.0.34
+pillow==7.1.2
+pyqt5-sip==12.8.0
+pyqt5==5.15.0
+torch==1.5.0
+torchvision==0.6.0
